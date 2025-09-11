@@ -533,15 +533,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree58eae7c4c5f7950a7969cbec0e5d50e5013fbf33targetblank58eae7ca">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree78b24033dbb37aedcc1a487ef26ea6fc2c3a3bd7targetblank78b2403a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xxie6/stability_selection/tree/58eae7c4c5f7950a7969cbec0e5d50e5013fbf33" target="_blank">58eae7c</a>
+<a href="https://github.com/xxie6/stability_selection/tree/78b24033dbb37aedcc1a487ef26ea6fc2c3a3bd7" target="_blank">78b2403</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree58eae7c4c5f7950a7969cbec0e5d50e5013fbf33targetblank58eae7ca"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree78b24033dbb37aedcc1a487ef26ea6fc2c3a3bd7targetblank78b2403a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -551,7 +551,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xxie6/stability_selection/tree/58eae7c4c5f7950a7969cbec0e5d50e5013fbf33" target="_blank">58eae7c</a>.
+<a href="https://github.com/xxie6/stability_selection/tree/78b24033dbb37aedcc1a487ef26ea6fc2c3a3bd7" target="_blank">78b2403</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -568,6 +568,11 @@ were generated:
 Ignored files:
     Ignored:    .DS_Store
     Ignored:    .Rhistory
+
+Untracked files:
+    Untracked:  analysis/bal_nonoverlap_setting.Rmd
+    Untracked:  analysis/baltree_setting.Rmd
+    Untracked:  analysis/sparse_overlap_setting.Rmd
 
 </code></pre>
 <p>
@@ -614,6 +619,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/78b24033dbb37aedcc1a487ef26ea6fc2c3a3bd7/analysis/unbal_nonoverlap_setting.Rmd" target="_blank">78b2403</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+<td>
+Update exploration of unbalanced non-overlap setting
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xxie6/stability_selection/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/unbal_nonoverlap_setting.html" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -700,6 +739,43 @@ sim_data &lt;- sim_star_data(sim_args)</code></pre>
 <p>This is a heatmap of the true loadings matrix:</p>
 <pre class="r"><code>plot_heatmap(sim_data$LL)</code></pre>
 <p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-5-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-5-1">
+Past versions of unnamed-chunk-5-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-5-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-5-1.png" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="gbcd" class="section level1">
 <h1>GBCD</h1>
@@ -717,7 +793,8 @@ X_split_by_col &lt;- stability_selection_split_data(sim_data$Y, dim = &#39;colum
 for (i in 1:length(X_split_by_col)){
   gbcd_fits_by_col[[i]] &lt;- gbcd::fit_gbcd(X_split_by_col[[i]], 
                                    Kmax = 4, 
-                                   prior = ebnm::ebnm_generalized_binary)$L
+                                   prior = ebnm::ebnm_generalized_binary,
+                                   verbose = 0)$L
 }</code></pre>
 <pre><code>[1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
@@ -730,141 +807,26 @@ Adding factor 2 to flash object...
 Adding factor 3 to flash object...
 Adding factor 4 to flash object...
 Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+04...
-  Difference between iterations is within 1.0e+03...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  --Maximum number of iterations reached!
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+03...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  Difference between iterations is within 1.0e-01...
-  Difference between iterations is within 1.0e-02...
-  Difference between iterations is within 1.0e-03...
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e-01...
-Wrapping up...
-Done.
-   user  system elapsed 
-  1.245   0.031   1.279 
-[1] &quot;Estimate GEP membership matrix L...&quot;
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 6 decreased the objective by 2.766e-02.
-  Difference between iterations is within 1.0e+03...
-An update to factor 6 decreased the objective by 1.685e-02.
-  Difference between iterations is within 1.0e+02...
-An update to factor 6 decreased the objective by 1.004e-08.
-An update to factor 6 decreased the objective by 1.788e-08.
-  Difference between iterations is within 1.0e+01...
-An update to factor 6 decreased the objective by 4.033e-08.
-An update to factor 6 decreased the objective by 5.686e-08.
-An update to factor 6 decreased the objective by 5.693e-08.
-An update to factor 6 decreased the objective by 3.479e-08.
-An update to factor 6 decreased the objective by 6.286e-08.
-An update to factor 6 decreased the objective by 6.075e-08.
-An update to factor 6 decreased the objective by 6.213e-08.
-An update to factor 6 decreased the objective by 6.027e-08.
-An update to factor 6 decreased the objective by 5.821e-08.
-An update to factor 6 decreased the objective by 6.034e-08.
-An update to factor 6 decreased the objective by 4.133e-08.
-An update to factor 6 decreased the objective by 5.677e-08.
-An update to factor 6 decreased the objective by 4.244e-08.
-  Difference between iterations is within 1.0e+00...
-An update to factor 6 decreased the objective by 4.943e-08.
-An update to factor 6 decreased the objective by 6.189e-08.
-  --Maximum number of iterations reached!
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 6 decreased the objective by 6.454e-09.
-An update to factor 6 decreased the objective by 4.365e-08.
-  Difference between iterations is within 1.0e+02...
-An update to factor 6 decreased the objective by 4.034e-08.
-  Difference between iterations is within 1.0e+01...
-An update to factor 6 decreased the objective by 1.174e-08.
-An update to factor 6 decreased the objective by 4.788e-08.
-An update to factor 6 decreased the objective by 3.263e-08.
-An update to factor 6 decreased the objective by 6.709e-08.
-An update to factor 6 decreased the objective by 5.143e-08.
-An update to factor 6 decreased the objective by 6.028e-08.
-An update to factor 6 decreased the objective by 5.772e-08.
-  Difference between iterations is within 1.0e+00...
-An update to factor 6 decreased the objective by 5.966e-08.
-An update to factor 6 decreased the objective by 5.322e-08.
-An update to factor 6 decreased the objective by 6.573e-08.
-An update to factor 6 decreased the objective by 3.987e-09.
-An update to factor 6 decreased the objective by 3.445e-09.
-An update to factor 6 decreased the objective by 2.289e-08.
-An update to factor 6 decreased the objective by 4.957e-08.
-An update to factor 6 decreased the objective by 5.152e-08.
-An update to factor 6 decreased the objective by 1.360e-08.
-An update to factor 6 decreased the objective by 2.951e-08.
-An update to factor 6 decreased the objective by 3.853e-08.
-An update to factor 6 decreased the objective by 5.653e-08.
-An update to factor 6 decreased the objective by 6.345e-08.
-An update to factor 6 decreased the objective by 5.693e-08.
-An update to factor 6 decreased the objective by 6.505e-08.
-An update to factor 6 decreased the objective by 5.467e-08.
-An update to factor 6 decreased the objective by 5.506e-08.
-An update to factor 6 decreased the objective by 3.315e-08.
-An update to factor 6 decreased the objective by 5.256e-08.
-An update to factor 6 decreased the objective by 8.440e-08.
-An update to factor 6 decreased the objective by 6.004e-08.
-An update to factor 6 decreased the objective by 6.448e-08.
-An update to factor 6 decreased the objective by 3.552e-08.
-An update to factor 6 decreased the objective by 7.949e-09.
-An update to factor 6 decreased the objective by 4.979e-08.
-An update to factor 6 decreased the objective by 9.313e-09.
-An update to factor 6 decreased the objective by 8.240e-08.
-  Difference between iterations is within 1.0e-01...
-An update to factor 6 decreased the objective by 7.867e-08.
-An update to factor 6 decreased the objective by 3.875e-08.
-An update to factor 6 decreased the objective by 4.212e-08.
-An update to factor 6 decreased the objective by 8.745e-08.
-An update to factor 6 decreased the objective by 7.014e-08.
-An update to factor 6 decreased the objective by 8.976e-08.
-  Difference between iterations is within 1.0e-02...
-An update to factor 6 decreased the objective by 8.736e-08.
-An update to factor 6 decreased the objective by 7.231e-08.
-An update to factor 6 decreased the objective by 8.551e-08.
-An update to factor 6 decreased the objective by 8.467e-08.
-An update to factor 6 decreased the objective by 8.033e-08.
-  Difference between iterations is within 1.0e-03...
-An update to factor 6 decreased the objective by 5.037e-08.
-An update to factor 6 decreased the objective by 4.572e-08.
-An update to factor 6 decreased the objective by 4.101e-08.
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 6 decreased the objective by 5.795e-08.
-An update to factor 6 decreased the objective by 3.234e-09.
-  Difference between iterations is within 1.0e-02...
-An update to factor 6 decreased the objective by 3.442e-08.
-  Difference between iterations is within 1.0e-03...
-An update to factor 6 decreased the objective by 5.836e-08.
-Wrapping up...
-Done.
-   user  system elapsed 
-  9.516   0.223  10.009 
+Done.</code></pre>
+<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
+reached.</code></pre>
+<pre><code>   user  system elapsed 
+  1.213   0.027   1.242 
+[1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
+<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
+reached.</code></pre>
+<pre><code>   user  system elapsed 
+  9.205   0.221   9.428 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 4 factors (tolerance: 1.19e-03)...
   Difference between iterations is within 1.0e-02...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.310   0.006   0.318 
+  0.303   0.006   0.311 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.003   0.000   0.004 
+  0.003   0.000   0.003 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -873,121 +835,14 @@ Adding factor 2 to flash object...
 Adding factor 3 to flash object...
 Adding factor 4 to flash object...
 Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+04...
-  Difference between iterations is within 1.0e+03...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  Difference between iterations is within 1.0e-01...
-  --Maximum number of iterations reached!
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+03...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  Difference between iterations is within 1.0e-01...
-  Difference between iterations is within 1.0e-02...
-  Difference between iterations is within 1.0e-03...
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e-01...
-Wrapping up...
-Done.
-   user  system elapsed 
-  0.843   0.024   0.977 
+Done.</code></pre>
+<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
+reached.</code></pre>
+<pre><code>   user  system elapsed 
+  0.776   0.022   0.799 
 [1] &quot;Estimate GEP membership matrix L...&quot;
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 6 decreased the objective by 5.334e-01.
-An update to factor 6 decreased the objective by 6.280e-01.
-  Difference between iterations is within 1.0e+02...
-An update to factor 6 decreased the objective by 4.444e-01.
-An update to factor 6 decreased the objective by 2.295e-01.
-  Difference between iterations is within 1.0e+01...
-An update to factor 6 decreased the objective by 1.705e-01.
-An update to factor 6 decreased the objective by 1.404e-01.
-An update to factor 6 decreased the objective by 1.175e-01.
-An update to factor 6 decreased the objective by 1.079e-01.
-An update to factor 6 decreased the objective by 1.056e-01.
-An update to factor 6 decreased the objective by 1.053e-01.
-An update to factor 6 decreased the objective by 1.016e-01.
-An update to factor 2 decreased the objective by 7.025e-02.
-An update to factor 6 decreased the objective by 8.961e-02.
-An update to factor 2 decreased the objective by 4.225e-01.
-An update to factor 6 decreased the objective by 8.768e-02.
-An update to factor 2 decreased the objective by 4.679e-01.
-An update to factor 6 decreased the objective by 8.539e-02.
-  Difference between iterations is within 1.0e+00...
-An update to factor 2 decreased the objective by 4.853e-01.
-An update to factor 6 decreased the objective by 8.389e-02.
-  Difference between iterations is within 1.0e-01...
-An update to factor 2 decreased the objective by 5.172e-01.
-An update to factor 6 decreased the objective by 8.316e-02.
-  Difference between iterations is within 1.0e-02...
-An update to factor 2 decreased the objective by 5.238e-01.
-An update to factor 6 decreased the objective by 8.277e-02.
-An update to factor 2 decreased the objective by 5.254e-01.
-An update to factor 6 decreased the objective by 8.257e-02.
-  Difference between iterations is within 1.0e-03...
-An update to factor 2 decreased the objective by 5.253e-01.
-An update to factor 4 decreased the objective by 7.892e-06.
-An update to factor 6 decreased the objective by 8.237e-02.
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 2 decreased the objective by 3.593e+01.
-An update to factor 2 decreased the objective by 1.238e+02.
-An update to factor 2 decreased the objective by 5.989e+01.
-  Difference between iterations is within 1.0e+02...
-An update to factor 2 decreased the objective by 6.148e+01.
-An update to factor 2 decreased the objective by 5.867e+01.
-An update to factor 2 decreased the objective by 4.955e+01.
-  Difference between iterations is within 1.0e+01...
-An update to factor 2 decreased the objective by 4.629e+01.
-An update to factor 2 decreased the objective by 4.074e+01.
-An update to factor 2 decreased the objective by 3.713e+01.
-An update to factor 2 decreased the objective by 3.817e+01.
-An update to factor 2 decreased the objective by 3.955e+01.
-An update to factor 2 decreased the objective by 3.940e+01.
-An update to factor 2 decreased the objective by 3.829e+01.
-An update to factor 2 decreased the objective by 3.779e+01.
-An update to factor 2 decreased the objective by 3.559e+01.
-An update to factor 2 decreased the objective by 3.446e+01.
-An update to factor 2 decreased the objective by 3.477e+01.
-  Difference between iterations is within 1.0e+00...
-An update to factor 2 decreased the objective by 3.482e+01.
-An update to factor 2 decreased the objective by 3.425e+01.
-An update to factor 2 decreased the objective by 3.373e+01.
-An update to factor 2 decreased the objective by 3.343e+01.
-An update to factor 2 decreased the objective by 3.311e+01.
-An update to factor 2 decreased the objective by 3.285e+01.
-  Difference between iterations is within 1.0e-01...
-An update to factor 2 decreased the objective by 3.266e+01.
-An update to factor 2 decreased the objective by 3.253e+01.
-  Difference between iterations is within 1.0e-02...
-An update to factor 2 decreased the objective by 3.243e+01.
-An update to factor 2 decreased the objective by 3.237e+01.
-  Difference between iterations is within 1.0e-03...
-An update to factor 2 decreased the objective by 3.232e+01.
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 2 decreased the objective by 3.073e+01.
-An update to factor 2 decreased the objective by 2.978e+01.
-  Difference between iterations is within 1.0e-01...
-An update to factor 2 decreased the objective by 2.976e+01.
-  Difference between iterations is within 1.0e-02...
-An update to factor 2 decreased the objective by 2.974e+01.
-  Difference between iterations is within 1.0e-03...
-An update to factor 2 decreased the objective by 2.973e+01.
-Wrapping up...
-Done.
    user  system elapsed 
-  2.199   0.033   2.315 
+  2.107   0.036   2.144 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 7 factors (tolerance: 1.19e-03)...
   --Estimate of factor 6 is numerically zero!
@@ -1002,19 +857,56 @@ An update to factor 5 decreased the objective by 3.811e-03.
 Wrapping up...
 Done.
    user  system elapsed 
-  0.535   0.012   0.548 </code></pre>
+  0.536   0.012   0.548 </code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_col[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_col[[1]])), max(abs(gbcd_fits_by_col[[1]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-7-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_col[[2]])), max(abs(gbcd_fits_by_col[[2]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-8-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-8-1">
+Past versions of unnamed-chunk-8-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-8-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-8-1.png" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(gbcd_fits_by_col[[1]], gbcd_fits_by_col[[2]], threshold = 0.99)
 L_est_by_col &lt;- results_by_col$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_col, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>In this case, the method was able to get rid of the extra factors.
 Something to think about is how to reconcile slight differences in the
 estimates – do I just pick one estimate? do I take an average?</p>
@@ -1028,11 +920,12 @@ X_split_by_row &lt;- stability_selection_split_data(sim_data$Y, dim = &#39;rows&
 for (i in 1:length(X_split_by_row)){
   gbcd_fits_by_row[[i]] &lt;- gbcd::fit_gbcd(X_split_by_row[[i]], 
                                    Kmax = 4, 
-                                   prior = ebnm::ebnm_generalized_binary)$L
+                                   prior = ebnm::ebnm_generalized_binary,
+                                   verbose = 0)$L
 }</code></pre>
 <pre><code>[1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.002   0.000   0.002 
+  0.001   0.000   0.002 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -1041,138 +934,26 @@ Adding factor 2 to flash object...
 Adding factor 3 to flash object...
 Adding factor 4 to flash object...
 Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+04...
-  Difference between iterations is within 1.0e+03...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  --Maximum number of iterations reached!
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  Difference between iterations is within 1.0e-01...
-  Difference between iterations is within 1.0e-02...
-  Difference between iterations is within 1.0e-03...
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e-02...
-  Difference between iterations is within 1.0e-03...
-  Difference between iterations is within 1.0e-04...
-Wrapping up...
-Done.
-   user  system elapsed 
-  4.615   0.089   4.740 
-[1] &quot;Estimate GEP membership matrix L...&quot;
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 4 decreased the objective by 4.614e-01.
-An update to factor 4 decreased the objective by 4.451e-01.
-An update to factor 4 decreased the objective by 8.108e-01.
-An update to factor 4 decreased the objective by 7.752e-01.
-  Difference between iterations is within 1.0e+02...
-An update to factor 4 decreased the objective by 6.053e-01.
-An update to factor 4 decreased the objective by 1.277e-01.
-An update to factor 4 decreased the objective by 2.244e-01.
-An update to factor 4 decreased the objective by 3.753e-01.
-An update to factor 4 decreased the objective by 5.531e-01.
-  Difference between iterations is within 1.0e+01...
-An update to factor 4 decreased the objective by 7.071e-01.
-An update to factor 4 decreased the objective by 4.604e-01.
-An update to factor 4 decreased the objective by 2.828e-01.
-An update to factor 4 decreased the objective by 1.421e-01.
-An update to factor 4 decreased the objective by 6.666e-02.
-An update to factor 4 decreased the objective by 1.771e-02.
-An update to factor 4 decreased the objective by 1.523e-02.
-An update to factor 4 decreased the objective by 1.668e-02.
-An update to factor 4 decreased the objective by 2.034e-02.
-An update to factor 4 decreased the objective by 6.134e-02.
-An update to factor 4 decreased the objective by 2.483e-02.
-An update to factor 4 decreased the objective by 2.583e-02.
-An update to factor 4 decreased the objective by 2.366e-02.
-An update to factor 4 decreased the objective by 2.401e-02.
-An update to factor 4 decreased the objective by 2.248e-02.
-  --Maximum number of iterations reached!
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 4 decreased the objective by 2.479e-02.
-An update to factor 4 decreased the objective by 2.634e-02.
-  Difference between iterations is within 1.0e+01...
-An update to factor 4 decreased the objective by 2.624e-02.
-An update to factor 4 decreased the objective by 2.538e-02.
-An update to factor 4 decreased the objective by 2.518e-02.
-An update to factor 4 decreased the objective by 2.558e-02.
-An update to factor 4 decreased the objective by 2.576e-02.
-An update to factor 4 decreased the objective by 2.534e-02.
-An update to factor 4 decreased the objective by 2.453e-02.
-An update to factor 4 decreased the objective by 2.383e-02.
-  Difference between iterations is within 1.0e+00...
-An update to factor 4 decreased the objective by 2.444e-02.
-An update to factor 4 decreased the objective by 2.383e-02.
-An update to factor 4 decreased the objective by 2.331e-02.
-An update to factor 4 decreased the objective by 2.343e-02.
-An update to factor 4 decreased the objective by 2.478e-02.
-An update to factor 4 decreased the objective by 2.539e-02.
-An update to factor 4 decreased the objective by 2.568e-02.
-An update to factor 4 decreased the objective by 2.580e-02.
-An update to factor 4 decreased the objective by 2.578e-02.
-An update to factor 4 decreased the objective by 2.568e-02.
-An update to factor 4 decreased the objective by 2.514e-02.
-An update to factor 4 decreased the objective by 2.494e-02.
-An update to factor 4 decreased the objective by 2.487e-02.
-An update to factor 4 decreased the objective by 2.483e-02.
-An update to factor 4 decreased the objective by 2.480e-02.
-An update to factor 4 decreased the objective by 2.480e-02.
-An update to factor 4 decreased the objective by 2.491e-02.
-An update to factor 4 decreased the objective by 2.564e-02.
-An update to factor 4 decreased the objective by 2.655e-02.
-An update to factor 4 decreased the objective by 2.535e-02.
-An update to factor 4 decreased the objective by 2.519e-02.
-  Difference between iterations is within 1.0e-01...
-An update to factor 4 decreased the objective by 2.480e-02.
-An update to factor 4 decreased the objective by 2.467e-02.
-An update to factor 4 decreased the objective by 2.456e-02.
-An update to factor 4 decreased the objective by 2.445e-02.
-An update to factor 4 decreased the objective by 2.433e-02.
-An update to factor 4 decreased the objective by 2.422e-02.
-An update to factor 4 decreased the objective by 2.410e-02.
-An update to factor 4 decreased the objective by 2.400e-02.
-An update to factor 4 decreased the objective by 2.392e-02.
-  Difference between iterations is within 1.0e-02...
-An update to factor 4 decreased the objective by 2.386e-02.
-An update to factor 4 decreased the objective by 2.382e-02.
-An update to factor 4 decreased the objective by 2.379e-02.
-  Difference between iterations is within 1.0e-03...
-An update to factor 4 decreased the objective by 2.377e-02.
-An update to factor 4 decreased the objective by 2.376e-02.
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 4 decreased the objective by 2.393e-02.
-An update to factor 4 decreased the objective by 2.386e-02.
-  Difference between iterations is within 1.0e-02...
-An update to factor 4 decreased the objective by 2.380e-02.
-  Difference between iterations is within 1.0e-03...
-An update to factor 4 decreased the objective by 2.377e-02.
-Wrapping up...
-Done.
-   user  system elapsed 
-  7.807   0.144   8.173 
+Done.</code></pre>
+<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
+reached.</code></pre>
+<pre><code>   user  system elapsed 
+  4.519   0.063   4.581 
+[1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
+<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
+reached.</code></pre>
+<pre><code>   user  system elapsed 
+  7.509   0.136   7.669 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 4 factors (tolerance: 1.91e-04)...
   Difference between iterations is within 1.0e-02...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.079   0.001   0.080 
+  0.076   0.001   0.078 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.005   0.000   0.006 
+  0.006   0.000   0.005 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -1181,161 +962,14 @@ Adding factor 2 to flash object...
 Adding factor 3 to flash object...
 Adding factor 4 to flash object...
 Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+04...
-  Difference between iterations is within 1.0e+03...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  --Maximum number of iterations reached!
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+03...
-  Difference between iterations is within 1.0e+02...
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  Difference between iterations is within 1.0e-01...
-  Difference between iterations is within 1.0e-02...
-  Difference between iterations is within 1.0e-03...
-  Difference between iterations is within 1.0e-04...
-Wrapping up...
-Done.
-Backfitting 4 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+00...
-Wrapping up...
-Done.
-   user  system elapsed 
-  0.808   0.017   0.869 
+Done.</code></pre>
+<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
+reached.</code></pre>
+<pre><code>   user  system elapsed 
+  0.753   0.013   0.766 
 [1] &quot;Estimate GEP membership matrix L...&quot;
-Backfitting 8 factors (tolerance: 3.81e-04)...
-  Difference between iterations is within 1.0e+02...
-An update to factor 6 decreased the objective by 4.645e-03.
-An update to factor 6 decreased the objective by 5.258e-03.
-An update to factor 6 decreased the objective by 5.130e-03.
-An update to factor 6 decreased the objective by 6.421e-03.
-An update to factor 6 decreased the objective by 6.056e-03.
-An update to factor 6 decreased the objective by 5.352e-03.
-An update to factor 6 decreased the objective by 5.119e-03.
-An update to factor 6 decreased the objective by 5.266e-03.
-  Difference between iterations is within 1.0e+01...
-An update to factor 6 decreased the objective by 5.244e-03.
-An update to factor 6 decreased the objective by 5.225e-03.
-An update to factor 6 decreased the objective by 5.262e-03.
-An update to factor 6 decreased the objective by 5.196e-03.
-An update to factor 6 decreased the objective by 5.175e-03.
-  Difference between iterations is within 1.0e+00...
-An update to factor 2 decreased the objective by 2.749e-01.
-An update to factor 6 decreased the objective by 5.167e-03.
-  Difference between iterations is within 1.0e-01...
-An update to factor 2 decreased the objective by 3.247e-01.
-An update to factor 6 decreased the objective by 5.166e-03.
-  Difference between iterations is within 1.0e-02...
-An update to factor 2 decreased the objective by 3.321e-01.
-An update to factor 6 decreased the objective by 5.166e-03.
-  Difference between iterations is within 1.0e-03...
-An update to factor 2 decreased the objective by 3.302e-01.
-An update to factor 6 decreased the objective by 5.166e-03.
-An update to factor 8 decreased the objective by 7.093e-05.
-  Difference between iterations is within 1.0e-04...
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 2 decreased the objective by 8.593e+01.
-An update to factor 6 decreased the objective by 5.849e-02.
-An update to factor 2 decreased the objective by 8.178e+01.
-An update to factor 6 decreased the objective by 1.187e-01.
-  Difference between iterations is within 1.0e+02...
-An update to factor 2 decreased the objective by 9.561e+01.
-An update to factor 6 decreased the objective by 1.307e-01.
-An update to factor 2 decreased the objective by 8.954e+01.
-An update to factor 6 decreased the objective by 1.313e-01.
-An update to factor 2 decreased the objective by 8.718e+01.
-An update to factor 6 decreased the objective by 1.275e-01.
-  Difference between iterations is within 1.0e+01...
-An update to factor 2 decreased the objective by 8.702e+01.
-An update to factor 6 decreased the objective by 1.336e-01.
-An update to factor 2 decreased the objective by 8.968e+01.
-An update to factor 6 decreased the objective by 1.151e-01.
-An update to factor 2 decreased the objective by 9.233e+01.
-An update to factor 6 decreased the objective by 1.051e-01.
-An update to factor 2 decreased the objective by 9.183e+01.
-An update to factor 6 decreased the objective by 1.026e-01.
-An update to factor 2 decreased the objective by 9.104e+01.
-An update to factor 6 decreased the objective by 1.047e-01.
-An update to factor 2 decreased the objective by 8.996e+01.
-An update to factor 6 decreased the objective by 9.788e-02.
-An update to factor 2 decreased the objective by 8.887e+01.
-An update to factor 6 decreased the objective by 9.208e-02.
-  Difference between iterations is within 1.0e+00...
-An update to factor 2 decreased the objective by 8.837e+01.
-An update to factor 6 decreased the objective by 9.166e-02.
-  Difference between iterations is within 1.0e-01...
-An update to factor 2 decreased the objective by 8.830e+01.
-An update to factor 6 decreased the objective by 9.168e-02.
-An update to factor 2 decreased the objective by 8.835e+01.
-An update to factor 6 decreased the objective by 9.254e-02.
-An update to factor 2 decreased the objective by 8.843e+01.
-An update to factor 6 decreased the objective by 9.472e-02.
-An update to factor 2 decreased the objective by 8.852e+01.
-An update to factor 6 decreased the objective by 9.741e-02.
-An update to factor 2 decreased the objective by 8.893e+01.
-An update to factor 6 decreased the objective by 9.749e-02.
-An update to factor 2 decreased the objective by 8.954e+01.
-An update to factor 6 decreased the objective by 9.670e-02.
-An update to factor 2 decreased the objective by 8.966e+01.
-An update to factor 6 decreased the objective by 9.629e-02.
-An update to factor 2 decreased the objective by 8.966e+01.
-An update to factor 6 decreased the objective by 9.615e-02.
-  Difference between iterations is within 1.0e-02...
-An update to factor 2 decreased the objective by 8.965e+01.
-An update to factor 6 decreased the objective by 9.603e-02.
-An update to factor 2 decreased the objective by 8.964e+01.
-An update to factor 6 decreased the objective by 9.585e-02.
-An update to factor 2 decreased the objective by 8.963e+01.
-An update to factor 6 decreased the objective by 9.550e-02.
-An update to factor 2 decreased the objective by 8.961e+01.
-An update to factor 6 decreased the objective by 9.436e-02.
-An update to factor 2 decreased the objective by 8.956e+01.
-An update to factor 6 decreased the objective by 8.901e-02.
-An update to factor 2 decreased the objective by 8.942e+01.
-An update to factor 6 decreased the objective by 8.470e-02.
-An update to factor 2 decreased the objective by 8.898e+01.
-An update to factor 6 decreased the objective by 8.596e-02.
-An update to factor 2 decreased the objective by 8.853e+01.
-An update to factor 6 decreased the objective by 8.646e-02.
-An update to factor 2 decreased the objective by 8.823e+01.
-An update to factor 6 decreased the objective by 8.511e-02.
-An update to factor 2 decreased the objective by 8.821e+01.
-An update to factor 6 decreased the objective by 8.390e-02.
-An update to factor 2 decreased the objective by 8.828e+01.
-An update to factor 6 decreased the objective by 8.322e-02.
-An update to factor 2 decreased the objective by 8.834e+01.
-An update to factor 6 decreased the objective by 8.290e-02.
-  Difference between iterations is within 1.0e-03...
-An update to factor 2 decreased the objective by 8.837e+01.
-An update to factor 6 decreased the objective by 8.276e-02.
-Wrapping up...
-Done.
-Backfitting 8 factors (tolerance: 3.81e-04)...
-An update to factor 2 decreased the objective by 9.201e+01.
-An update to factor 6 decreased the objective by 8.113e-02.
-An update to factor 2 decreased the objective by 8.740e+01.
-An update to factor 6 decreased the objective by 8.526e-02.
-  Difference between iterations is within 1.0e-01...
-An update to factor 2 decreased the objective by 8.770e+01.
-An update to factor 6 decreased the objective by 8.603e-02.
-  Difference between iterations is within 1.0e-02...
-An update to factor 2 decreased the objective by 8.794e+01.
-An update to factor 6 decreased the objective by 8.634e-02.
-  Difference between iterations is within 1.0e-03...
-An update to factor 2 decreased the objective by 8.804e+01.
-An update to factor 6 decreased the objective by 8.651e-02.
-Wrapping up...
-Done.
    user  system elapsed 
-  2.832   0.040   2.879 
+  2.728   0.043   2.773 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 8 factors (tolerance: 2.19e-03)...
   --Estimate of factor 7 is numerically zero!
@@ -1349,18 +983,55 @@ Backfitting 8 factors (tolerance: 2.19e-03)...
 Wrapping up...
 Done.
    user  system elapsed 
- 10.681   0.290  11.136 </code></pre>
+ 10.592   0.266  10.860 </code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row[[1]])), max(abs(gbcd_fits_by_row[[1]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is heatmap of the loadings estimate from the second subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row[[2]])), max(abs(gbcd_fits_by_row[[2]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-14-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-14-1">
+Past versions of unnamed-chunk-14-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-14-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-14-1.png" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(gbcd_fits_by_row[[1]], gbcd_fits_by_row[[2]], threshold = 0.99)
 L_est_by_row &lt;- results_by_row$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_row, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>In this case, the method only recovers two of the four factors.
 Visually, it looks like both sets of results have all four components.
 But perhaps the cosine similarity was not quite high enough to exceed
@@ -1370,7 +1041,7 @@ it does find all four factors.</p>
 <pre class="r"><code>results_by_row_threshold0.98 &lt;- stability_selection_post_processing(gbcd_fits_by_row[[1]], gbcd_fits_by_row[[2]], threshold = 0.98)
 L_est_by_row_threshold0.98 &lt;- results_by_row_threshold0.98$L</code></pre>
 <pre class="r"><code>plot_heatmap(L_est_by_row_threshold0.98, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row_threshold0.98)), max(abs(L_est_by_row_threshold0.98)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="ebcd" class="section level1">
@@ -1383,7 +1054,8 @@ of components.</p>
 <div id="stability-selection-via-splitting-columns-1"
 class="section level2">
 <h2>Stability Selection via Splitting Columns</h2>
-<pre class="r"><code>ebcd_fits_by_col &lt;- list()
+<pre class="r"><code>set.seed(1)
+ebcd_fits_by_col &lt;- list()
 for (i in 1:length(X_split_by_col)){
   ebcd_fits_by_col[[i]] &lt;- ebcd::ebcd(t(X_split_by_col[[i]]), 
                                    Kmax = 8, 
@@ -1392,16 +1064,53 @@ for (i in 1:length(X_split_by_col)){
 <p>This is a heatmap of the estimated loadings from the first
 subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is a heatmap of the estimated loadings from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-21-1">
+Past versions of unnamed-chunk-21-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-21-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-21-1.png" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.99)
 L_est_by_col &lt;- results_by_col$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_col, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-24-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The method recovers all four components.</p>
 </div>
 <div id="stability-selection-via-splitting-rows-1"
@@ -1416,16 +1125,53 @@ for (i in 1:length(X_split_by_row)){
 }</code></pre>
 <p>This is a heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_row[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row[[1]])), max(abs(ebcd_fits_by_row[[1]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_row[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row[[2]])), max(abs(ebcd_fits_by_row[[2]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-26-1">
+Past versions of unnamed-chunk-26-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-26-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-26-1.png" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(ebcd_fits_by_row[[1]], ebcd_fits_by_row[[2]], threshold = 0.99)
 L_est_by_row &lt;- results_by_row$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_row, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>In this case, only three of the four components are recovered. Given
 that in the first loadings estimate, only of the factors contains the
 effects of two components, I don’t think reducing the similarity
@@ -1451,15 +1197,52 @@ for (i in 1:length(X_split_by_col)){
 <p>This is a heatmap of the estimated loadings from the first
 subset:</p>
 <pre class="r"><code>plot_heatmap(codesymnmf_fits_by_col[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(codesymnmf_fits_by_col[[1]])), max(abs(codesymnmf_fits_by_col[[1]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is a heatmap of the estimated loadings from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(codesymnmf_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(codesymnmf_fits_by_col[[2]])), max(abs(codesymnmf_fits_by_col[[2]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-31-1">
+Past versions of unnamed-chunk-31-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-31-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-31-1.png" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.99)
 L_est_by_col &lt;- results_by_col$L</code></pre>
 <pre class="r"><code>plot_heatmap(L_est_by_col, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-33-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The method recovers all four components.</p>
 </div>
 <div id="stability-selection-via-splitting-rows-2"
@@ -1473,16 +1256,53 @@ for (i in 1:length(X_split_by_row)){
 <p>This is a heatmap of the estimated loadings from the first
 subset:</p>
 <pre class="r"><code>plot_heatmap(codesymnmf_fits_by_row[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(codesymnmf_fits_by_row[[1]])), max(abs(codesymnmf_fits_by_row[[1]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is a heatmap of the estimated loadings from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(codesymnmf_fits_by_row[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(codesymnmf_fits_by_row[[2]])), max(abs(codesymnmf_fits_by_row[[2]])), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-36-1">
+Past versions of unnamed-chunk-36-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-36-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/67886396f17ecb27b06c31819d57437fd7a16d4e/docs/figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-36-1.png" target="_blank">6788639</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-11
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(codesymnmf_fits_by_row[[1]], codesymnmf_fits_by_row[[2]], threshold = 0.99)
 L_est_by_row &lt;- results_by_row$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_row, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-39-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>The method returns three of the four components. Again, looking at
 the estimates, it seems like both contain all four components. However,
 they might not be similar enough to exceed the similarity threshold. If
@@ -1492,7 +1312,7 @@ four components.</p>
 L_est_by_row &lt;- results_by_row$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_row, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))</code></pre>
-<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-41-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/unbal_nonoverlap_setting.Rmd/unnamed-chunk-40-1.png" width="672" style="display: block; margin: auto;" /></p>
 </div>
 </div>
 <div id="observations" class="section level1">
