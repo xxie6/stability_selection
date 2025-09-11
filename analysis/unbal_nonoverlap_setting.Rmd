@@ -78,12 +78,13 @@ set.seed(1)
 X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
 ```
 
-```{r}
+```{r, message }
 gbcd_fits_by_col <- list()
 for (i in 1:length(X_split_by_col)){
   gbcd_fits_by_col[[i]] <- gbcd::fit_gbcd(X_split_by_col[[i]], 
                                    Kmax = 4, 
-                                   prior = ebnm::ebnm_generalized_binary)$L
+                                   prior = ebnm::ebnm_generalized_binary,
+                                   verbose = 0)$L
 }
 ```
 
@@ -122,7 +123,8 @@ gbcd_fits_by_row <- list()
 for (i in 1:length(X_split_by_row)){
   gbcd_fits_by_row[[i]] <- gbcd::fit_gbcd(X_split_by_row[[i]], 
                                    Kmax = 4, 
-                                   prior = ebnm::ebnm_generalized_binary)$L
+                                   prior = ebnm::ebnm_generalized_binary,
+                                   verbose = 0)$L
 }
 ```
 
@@ -166,6 +168,7 @@ In this section, I try stability selection with the GBCD method. When given a `K
 ## Stability Selection via Splitting Columns
 
 ```{r}
+set.seed(1)
 ebcd_fits_by_col <- list()
 for (i in 1:length(X_split_by_col)){
   ebcd_fits_by_col[[i]] <- ebcd::ebcd(t(X_split_by_col[[i]]), 
