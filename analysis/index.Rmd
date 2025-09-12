@@ -8,4 +8,15 @@ editor_options:
   chunk_output_type: console
 ---
 
-Welcome to my research website.
+This is my investigation of a stability selection procedure for covariance decomposition methods.
+
+Main takeaways thus far:  
+  
+* Overall, splitting the data via the columns seems to have better performance than splitting via the rows. 
+
+All analyses:  
+   
+* Exploration of [stability selection in the unbalanced nonoverlapping setting](unbal_nonoverlap_setting.html) 
+* Exploration of [stability selection in the balanced nonoverlapping setting](bal_nonoverlap_setting.html) 
+* Exploration of [stability selection in the balanced tree setting](baltree_setting.html) 
+* Exploration of [stability selection in the sparse overlapping setting](sparse_overlap_setting.html)  
