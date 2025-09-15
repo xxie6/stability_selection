@@ -1,0 +1,189 @@
+---
+title: "crossprod_sim_match_example"
+author: "Annie Xie"
+date: "2025-09-15"
+output: 
+  workflowr::wflow_html:
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+In this analysis, I provide an example where pairing the factors using the crossproduct similarity objective does not lead to the most similar factors being paired.
+
+```{r, message = FALSE, warning = FALSE}
+library(dplyr)
+library(ggplot2)
+library(pheatmap)
+```
+
+```{r}
+source('code/visualization_functions.R')
+```
+
+# Code
+This is the version of stability selection that pairs the factors of the two estimates, creating a one-to-one mapping.
+
+```{r}
+stability_selection_split_data <- function(X, dim = c('rows', 'columns')){
+
+  if (dim == 'rows'){
+    n <- nrow(X)
+    n1 <- ceiling(n/2)
+    # n2 <- floor(nrow(X)/2)
+  } else if (dim == 'columns'){
+    n <- ncol(X)
+    n1 <- ceiling(n/2)
+    # n2 <- floor(ncol(X)/2)
+  } else {
+    stop('Wrong input for dim')
+  }
+  
+  subset1 <- sample(n, size = n1, replace = FALSE)
+  X1 <- X[,subset1]
+  X2 <- X[,-(subset1)]
+  return(list(X1, X2))
+}
+
+stability_selection_post_processing <- function(L1, L2, threshold=0.99){
+  K1 <- ncol(L1)
+  K2 <- ncol(L2)
+  n <- nrow(L1)
+  
+  #if estimates don't have same number of columns, try padding the estimate with zeros and make cosine similarity zero
+  if (K1 < K2){
+    L1 <- cbind(L1, matrix(0, ncol = (K2-K1), nrow = n))
+  }
+  
+  if (K1 > K2){
+    L2 <- cbind(L2, matrix(0, ncol = (K1-K2), nrow = n))
+  }
+  
+  # use cosine similarity as similarity metric
+  # could try correlation but may run into issues if there is a constant baseline
+  norms1 <- apply(L1, 2, function(x){sqrt(sum(x^2))})
+  norms1[norms1 == 0] <- Inf
+  
+  norms2 <- apply(L2, 2, function(x){sqrt(sum(x^2))})
+  norms2[norms2 == 0] <- Inf
+  
+  L1_normalized <- t(t(L1)/norms1)
+  L2_normalized <- t(t(L2)/norms2)
+  
+  #compute matrix of cosine similarities
+  cosine_sim_matrix <- abs(crossprod(L1_normalized, L2_normalized))
+  
+  assignment_problem <- lpSolve::lp.assign(cosine_sim_matrix, direction = "max")
+  perm <- apply(assignment_problem$solution, 1, which.max)
+  
+  max_similarity <- diag(cosine_sim_matrix[,perm])
+  factors.idx.keep <- max_similarity > threshold
+  L_final <- L1[, factors.idx.keep]
+  
+  return(list(L = L_final, similarity = cosine_sim_matrix, perm = perm))
+}
+```
+
+# CoDesymNMF in unbalanced nonoverlapping setting
+
+I present an example of CoDesymNMF in the unbalanced nonoverlapping setting.
+
+## Data Generation
+```{r}
+sim_star_data <- function(args) {
+  set.seed(args$seed)
+  
+  n <- sum(args$pop_sizes)
+  p <- args$n_genes
+  K <- length(args$pop_sizes)
+  
+  FF <- matrix(rnorm(K * p, sd = rep(args$branch_sds, each = p)), ncol = K)
+  
+  LL <- matrix(0, nrow = n, ncol = K)
+  for (k in 1:K) {
+    vec <- rep(0, K)
+    vec[k] <- 1
+    LL[, k] <- rep(vec, times = args$pop_sizes)
+  }
+  
+  E <- matrix(rnorm(n * p, sd = args$indiv_sd), nrow = n)
+  Y <- LL %*% t(FF) + E
+  YYt <- (1/p)*tcrossprod(Y)
+  
+  return(list(Y = Y, YYt = YYt, LL = LL, FF = FF, K = ncol(LL)))
+}
+```
+
+```{r}
+pop_sizes <- c(20,50,30,60)
+n_genes <- 1000
+branch_sds <- rep(2,4)
+indiv_sd <- 1
+seed <- 1
+sim_args = list(pop_sizes = pop_sizes, branch_sds = branch_sds, indiv_sd = indiv_sd, n_genes = n_genes, seed = seed)
+sim_data <- sim_star_data(sim_args)
+```
+
+This is a heatmap of the true loadings matrix:
+```{r}
+plot_heatmap(sim_data$LL)
+```
+
+## Stability Selection via Splitting Columns
+
+First, I try splitting the data by splitting the columns.
+```{r}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r}
+codesymnmf_fits_by_col <- list()
+for (i in 1:length(X_split_by_col)){
+  cov_mat <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
+  codesymnmf_fits_by_col[[i]] <- codesymnmf::codesymnmf(cov_mat, 8)$H
+}
+```
+
+This is a heatmap of the estimated loadings from the first subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[1]])), max(abs(codesymnmf_fits_by_col[[1]])), length.out = 50))
+```
+
+This is a heatmap of the estimated loadings from the second subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[2]])), max(abs(codesymnmf_fits_by_col[[2]])), length.out = 50))
+```
+
+```{r}
+results_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.99)
+L_est_by_col <- results_by_col$L
+```
+
+This is the cosine similarity matrix between the two esimates:
+```{r}
+results_by_col$similarity
+```
+
+From this, we would expect all four components to be recovered because their maximum similarities all exceed 0.99.
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+We see that in the final loadings estimate, we only recover three of the four components. It is surprisng that we did not recover the first group. Looking at the similarities for the paired factors, we see that the first factors from both estimates were not paired.
+
+This is the pairing where the index refers to the index of the factor in the first estimate and the entry refers to the index of the factor in the second estimate.
+```{r}
+results_by_col$perm
+```
+
+These are the similarities of the pairs.
+```{r}
+diag(results_by_col$similarity[,results_by_col$perm])
+```
+
+Factor 5 in the first estimate is also highly similar to factor 1 in the second estimate (but not as highly similar as factor 1 from the first estimate). However, the values of the similarities with the other factors meant that a higher objective function could be attained by pairing factor 5 from the first estimate with factor 1 from the second estimate and pairing factor 1 from the first estimate to another factor. Intuitively, I think we would expect factors that are highly similar (e.g. similarity exceeding 0.99) to always be matched. 
