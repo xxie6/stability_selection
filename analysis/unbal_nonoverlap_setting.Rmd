@@ -78,9 +78,9 @@ set.seed(1)
 X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
 ```
 
-```{r, message }
+```{r}
 gbcd_fits_by_col <- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col)-2)){
   gbcd_fits_by_col[[i]] <- gbcd::fit_gbcd(X_split_by_col[[i]], 
                                    Kmax = 4, 
                                    prior = ebnm::ebnm_generalized_binary,
@@ -108,7 +108,12 @@ This is a heatmap of the final loadings estimate:
 plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
 ```
 
-In this case, the method was able to get rid of the extra factors. Something to think about is how to reconcile slight differences in the estimates -- do I just pick one estimate? do I take an average?
+This is the correlation between the estiamte and the true loadings:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, max)
+```
+
+In this case, the method was able to get rid of the extra factors. Something to think about is how to reconcile slight differences in the estimates -- do I just pick one estimate? do I take an average? Taking an average feels intuitive, but for now, I just pick one.
 
 ## Stability Selection via Splitting Rows
 
@@ -119,28 +124,37 @@ X_split_by_row <- stability_selection_split_data(sim_data$Y, dim = 'rows')
 ```
 
 ```{r}
-gbcd_fits_by_row <- list()
-for (i in 1:length(X_split_by_row)){
-  gbcd_fits_by_row[[i]] <- gbcd::fit_gbcd(X_split_by_row[[i]], 
+gbcd_fits_by_row_F <- list()
+gbcd_fits_by_row_L <- list()
+for (i in 1:(length(X_split_by_row)-2)){
+  gbcd_fit <- gbcd::fit_gbcd(X_split_by_row[[i]], 
                                    Kmax = 4, 
                                    prior = ebnm::ebnm_generalized_binary,
-                                   verbose = 0)$L
+                                   verbose = 0)
+  gbcd_fits_by_row_F[[i]] <- gbcd_fit$F$lfc
+  gbcd_fits_by_row_L[[i]] <- gbcd_fit$L
 }
 ```
 
 This is heatmap of the loadings estimate from the first subset:
 ```{r}
-plot_heatmap(gbcd_fits_by_row[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row[[1]])), max(abs(gbcd_fits_by_row[[1]])), length.out = 50))
+plot_heatmap(gbcd_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_L[[1]])), max(abs(gbcd_fits_by_row_L[[1]])), length.out = 50))
 ```
 
 This is heatmap of the loadings estimate from the second subset:
 ```{r}
-plot_heatmap(gbcd_fits_by_row[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row[[2]])), max(abs(gbcd_fits_by_row[[2]])), length.out = 50))
+plot_heatmap(gbcd_fits_by_row_L[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_L[[2]])), max(abs(gbcd_fits_by_row_L[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_row <- stability_selection_post_processing(gbcd_fits_by_row[[1]], gbcd_fits_by_row[[2]], threshold = 0.99)
+results_by_row <- stability_selection_row_split_post_processing(gbcd_fits_by_row_L[[1]], gbcd_fits_by_row_L[[2]], gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]], threshold = 0.8)
 L_est_by_row <- results_by_row$L
+L_est_by_row <- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), ]
+```
+
+This is the similarity matrix:
+```{r}
+results_by_row$similarity
 ```
 
 This is a heatmap of the final loadings estimate:
@@ -148,18 +162,12 @@ This is a heatmap of the final loadings estimate:
 plot_heatmap(L_est_by_row, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))
 ```
 
-In this case, the method only recovers two of the four factors. Visually, it looks like both sets of results have all four components. But perhaps the cosine similarity was not quite high enough to exceed the very high threshold (0.99).
-
-Note if I reduce the threshold a little bit (from 0.99 to 0.98), then it does find all four factors.
-
+This is the correlation between the estimate and the true loadings:
 ```{r}
-results_by_row_threshold0.98 <- stability_selection_post_processing(gbcd_fits_by_row[[1]], gbcd_fits_by_row[[2]], threshold = 0.98)
-L_est_by_row_threshold0.98 <- results_by_row_threshold0.98$L
+apply(cor(L_est_by_row, sim_data$LL), 1, max)
 ```
 
-```{r}
-plot_heatmap(L_est_by_row_threshold0.98, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row_threshold0.98)), max(abs(L_est_by_row_threshold0.98)), length.out = 50))
-```
+The method is also able to recover all four components.
 
 # EBCD
 
@@ -170,7 +178,7 @@ In this section, I try stability selection with the GBCD method. When given a `K
 ```{r}
 set.seed(1)
 ebcd_fits_by_col <- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col)-2)){
   ebcd_fits_by_col[[i]] <- ebcd::ebcd(t(X_split_by_col[[i]]), 
                                    Kmax = 8, 
                                    ebnm_fn = ebnm::ebnm_generalized_binary)$EL
@@ -188,8 +196,12 @@ plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brk
 ```
 
 ```{r}
-results_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.99)
+results_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.8)
 L_est_by_col <- results_by_col$L
+```
+
+```{r}
+results_by_col$similarity
 ```
 
 This is a heatmap of the final loadings estimate:
@@ -197,33 +209,56 @@ This is a heatmap of the final loadings estimate:
 plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
 ```
 
-The method recovers all four components.
+This is the correlation between the estimate and the true loadings:
+```{r}
+apply(cor(L_est_by_row, sim_data$LL), 1, max)
+```
+
+The method also recovers all four components.
 
 ## Stability Selection via Splitting Rows
 
 ```{r}
+transform_ebcd_Z <- function(Y, ebcd_obj){
+  Y.svd <- svd(Y)
+  Y.UV <- Y.svd$u %*% t(Y.svd$v)
+  Z_transformed <- Y.UV %*% ebcd_obj$Z
+  return(Z_transformed)
+}
+```
+
+```{r}
 set.seed(1)
-ebcd_fits_by_row <- list()
-for (i in 1:length(X_split_by_row)){
-  ebcd_fits_by_row[[i]] <- ebcd::ebcd(t(X_split_by_row[[i]]), 
+ebcd_fits_by_row_L <- list()
+ebcd_fits_by_row_F <- list()
+for (i in 1:(length(X_split_by_row)-2)){
+  ebcd_fit <- ebcd::ebcd(t(X_split_by_row[[i]]), 
                                    Kmax = 8, 
-                                   ebnm_fn = ebnm::ebnm_generalized_binary)$EL
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)
+  ebcd_fits_by_row_L[[i]] <- ebcd_fit$EL
+  ebcd_fits_by_row_F[[i]] <- transform_ebcd_Z(t(X_split_by_row[[i]]), ebcd_fit)
 }
 ```
 
 This is a heatmap of the loadings estimate from the first subset:
 ```{r}
-plot_heatmap(ebcd_fits_by_row[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row[[1]])), max(abs(ebcd_fits_by_row[[1]])), length.out = 50))
+plot_heatmap(ebcd_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_L[[1]])), max(abs(ebcd_fits_by_row_L[[1]])), length.out = 50))
 ```
 
 This is a heatmap of the loadings estimate from the second subset:
 ```{r}
-plot_heatmap(ebcd_fits_by_row[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row[[2]])), max(abs(ebcd_fits_by_row[[2]])), length.out = 50))
+plot_heatmap(ebcd_fits_by_row_L[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_L[[2]])), max(abs(ebcd_fits_by_row_L[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_row <- stability_selection_post_processing(ebcd_fits_by_row[[1]], ebcd_fits_by_row[[2]], threshold = 0.99)
+results_by_row <- stability_selection_row_split_post_processing(ebcd_fits_by_row_L[[1]], ebcd_fits_by_row_L[[2]], ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]], threshold = 0.5)
 L_est_by_row <- results_by_row$L
+L_est_by_row <- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), ]
+```
+
+This is the similarity matrix:
+```{r}
+results_by_row$similarity
 ```
 
 This is a heatmap of the final loadings estimate:
@@ -231,7 +266,12 @@ This is a heatmap of the final loadings estimate:
 plot_heatmap(L_est_by_row, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))
 ```
 
-In this case, only three of the four components are recovered. Given that in the first loadings estimate, only of the factors contains the effects of two components, I don't think reducing the similarity threshold would allow the method to recover all four factors (unless the threshold is significantly reduced).
+This is the correlation between the estimate and the true loadings:
+```{r}
+apply(cor(L_est_by_row, sim_data$LL), 1, max)
+```
+
+This method returns all four components as well.
 
 # CoDesymNMF
 
@@ -241,7 +281,7 @@ In this section, I try stability selection with the CoDesymNMF method. Similar t
 
 ```{r}
 codesymnmf_fits_by_col <- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col)/2)){
   cov_mat <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
   codesymnmf_fits_by_col[[i]] <- codesymnmf::codesymnmf(cov_mat, 8)$H
 }
@@ -266,31 +306,51 @@ L_est_by_col <- results_by_col$L
 plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
 ```
 
+This is the correlation between the estimate and the true loadings:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, max)
+```
+
 The method recovers all four components.
 
 ## Stability Selection via Splitting Rows
 
 ```{r}
-codesymnmf_fits_by_row <- list()
-for (i in 1:length(X_split_by_row)){
+PolarU <- function(A) {
+  svdA <- svd(A)
+  out <- svdA$u %*% t(svdA$v)
+  return(out)
+}
+```
+
+```{r}
+codesymnmf_fits_by_row_L <- list()
+codesymnmf_fits_by_row_F <- list()
+for (i in 1:(length(X_split_by_row)-2)){
   cov_mat <- tcrossprod(X_split_by_row[[i]])/ncol(X_split_by_row[[i]])
-  codesymnmf_fits_by_row[[i]] <- codesymnmf::codesymnmf(cov_mat, 8)$H
+  codesymnmf_fits_by_row_L[[i]] <- codesymnmf::codesymnmf(cov_mat, 8)$H
+  codesymnmf_fits_by_row_F[[i]] <- PolarU(t(X_split_by_row[[i]]) %*% codesymnmf_fits_by_row_L[[i]])
 }
 ```
 
 This is a heatmap of the estimated loadings from the first subset:
 ```{r}
-plot_heatmap(codesymnmf_fits_by_row[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_row[[1]])), max(abs(codesymnmf_fits_by_row[[1]])), length.out = 50))
+plot_heatmap(codesymnmf_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_row_L[[1]])), max(abs(codesymnmf_fits_by_row_L[[1]])), length.out = 50))
 ```
 
 This is a heatmap of the estimated loadings from the second subset:
 ```{r}
-plot_heatmap(codesymnmf_fits_by_row[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_row[[2]])), max(abs(codesymnmf_fits_by_row[[2]])), length.out = 50))
+plot_heatmap(codesymnmf_fits_by_row_L[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_row_L[[2]])), max(abs(codesymnmf_fits_by_row_L[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_row <- stability_selection_post_processing(codesymnmf_fits_by_row[[1]], codesymnmf_fits_by_row[[2]], threshold = 0.99)
+results_by_row <- stability_selection_row_split_post_processing(codesymnmf_fits_by_row_L[[1]], codesymnmf_fits_by_row_L[[2]], codesymnmf_fits_by_row_F[[1]], codesymnmf_fits_by_row_F[[2]], threshold = 0.6)
 L_est_by_row <- results_by_row$L
+L_est_by_row <- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), ]
+```
+
+```{r}
+results_by_row$similarity
 ```
 
 This is a heatmap of the final loadings estimate:
@@ -298,17 +358,7 @@ This is a heatmap of the final loadings estimate:
 plot_heatmap(L_est_by_row, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))
 ```
 
-The method returns three of the four components. Again, looking at the estimates, it seems like both contain all four components. However, they might not be similar enough to exceed the similarity threshold. If I reduce the threshold from 0.99 to 0.98, then the method recovers all four components.
-
-```{r}
-results_by_row <- stability_selection_post_processing(codesymnmf_fits_by_row[[1]], codesymnmf_fits_by_row[[2]], threshold = 0.98)
-L_est_by_row <- results_by_row$L
-```
-
-This is a heatmap of the final loadings estimate:
-```{r}
-plot_heatmap(L_est_by_row, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row)), max(abs(L_est_by_row)), length.out = 50))
-```
+This method also returns all four components.
 
 # Observations
-Overall, it seems like splitting by the columns does a better job at recovering all of the factors. One possible explanation is because both subsets contain data for all of the samples, the individual loadings estimates are more likely to contain the four components. On the other hand, when the data is split by rows, each subset may not contain all of the information needed to recover the components.
+In this setting, all of the methods were able to recover all four components.
