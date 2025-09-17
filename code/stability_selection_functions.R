@@ -83,10 +83,8 @@ stability_selection_row_split_post_processing <- function(L1, L2, F1, F2,
   if (length(factors.idx.keep) == 0){
     L_final = matrix(0, nrow = n, ncol = 1)
   } else if (idx == 1) {
-    print('idx = 1')
     L_final <- rbind(L1[,factors.idx.keep, drop = FALSE], L2[,max_similarity_est2_idx[factors.idx.keep], drop = FALSE])
   } else { # captures idx == 2
-    print('idx = 2')
     L_final <- rbind(L1[,max_similarity_est2_idx[factors.idx.keep]], L2[, factors.idx.keep])
   }
 
