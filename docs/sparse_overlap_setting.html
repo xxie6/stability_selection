@@ -402,7 +402,7 @@ class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span>
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2025-09-12
+<strong>Last updated:</strong> 2025-09-17
 </p>
 <p>
 <strong>Checks:</strong> <span
@@ -533,15 +533,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree017d47bc908c49c91687c06d51926976a46b966dtargetblank017d47ba">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree8a2e5a446d60e7cc89894697a33630f80e37ab5ctargetblank8a2e5a4a">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xxie6/stability_selection/tree/017d47bc908c49c91687c06d51926976a46b966d" target="_blank">017d47b</a>
+<a href="https://github.com/xxie6/stability_selection/tree/8a2e5a446d60e7cc89894697a33630f80e37ab5c" target="_blank">8a2e5a4</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree017d47bc908c49c91687c06d51926976a46b966dtargetblank017d47ba"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree8a2e5a446d60e7cc89894697a33630f80e37ab5ctargetblank8a2e5a4a"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -551,7 +551,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xxie6/stability_selection/tree/017d47bc908c49c91687c06d51926976a46b966d" target="_blank">017d47b</a>.
+<a href="https://github.com/xxie6/stability_selection/tree/8a2e5a446d60e7cc89894697a33630f80e37ab5c" target="_blank">8a2e5a4</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -568,6 +568,7 @@ were generated:
 Ignored files:
     Ignored:    .DS_Store
     Ignored:    .Rhistory
+    Ignored:    .Rproj.user/
 
 </code></pre>
 <p>
@@ -614,6 +615,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/8a2e5a446d60e7cc89894697a33630f80e37ab5c/analysis/sparse_overlap_setting.Rmd" target="_blank">8a2e5a4</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-17
+</td>
+<td>
+Correct row-split analysis in overlap setting
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xxie6/stability_selection/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/sparse_overlap_setting.html" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -732,6 +767,43 @@ sim_data &lt;- sim_binary_loadings_data(sim_args)</code></pre>
 <p>This is a heatmap of the true loadings matrix:</p>
 <pre class="r"><code>plot_heatmap(sim_data$LL)</code></pre>
 <p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-6-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="gbcd" class="section level1">
 <h1>GBCD</h1>
@@ -746,7 +818,7 @@ class="section level2">
 <pre class="r"><code>set.seed(1)
 X_split_by_col &lt;- stability_selection_split_data(sim_data$Y, dim = &#39;columns&#39;)</code></pre>
 <pre class="r"><code>gbcd_fits_by_col &lt;- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col)-2)){
   gbcd_fits_by_col[[i]] &lt;- gbcd::fit_gbcd(X_split_by_col[[i]], 
                                    Kmax = 10, 
                                    prior = ebnm::ebnm_generalized_binary,
@@ -754,7 +826,7 @@ for (i in 1:length(X_split_by_col)){
 }</code></pre>
 <pre><code>[1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.004   0.000   0.004 
+  0.004   0.000   0.003 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -773,7 +845,7 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  4.068   0.133   4.210 
+  4.005   0.167   4.190 
 [1] &quot;Estimate GEP membership matrix L...&quot;
   --Estimate of factor 10 is numerically zero!
   --Estimate of factor 10 is numerically zero!
@@ -812,7 +884,7 @@ reached.</code></pre>
   --Estimate of factor 8 is numerically zero!
   --Estimate of factor 2 is numerically zero!
    user  system elapsed 
- 13.633   0.323  14.071 
+ 13.493   0.319  13.917 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 16 factors (tolerance: 7.45e-04)...
   --Estimate of factor 13 is numerically zero!
@@ -834,10 +906,10 @@ An update to factor 12 decreased the objective by 4.800e-05.
 Wrapping up...
 Done.
    user  system elapsed 
- 18.873   0.443  19.663 
+ 17.828   0.574  18.496 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.001   0.000   0.001 
+  0.002   0.000   0.001 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -856,7 +928,7 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  3.503   0.131   3.649 
+  3.435   0.131   3.569 
 [1] &quot;Estimate GEP membership matrix L...&quot;
   --Estimate of factor 17 is numerically zero!
   --Estimate of factor 20 is numerically zero!
@@ -869,7 +941,7 @@ reached.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  8.842   0.182   9.111 
+  8.769   0.195   9.187 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 11 factors (tolerance: 7.45e-04)...
   Difference between iterations is within 1.0e+01...
@@ -879,40 +951,161 @@ Backfitting 11 factors (tolerance: 7.45e-04)...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.831   0.021   0.852 </code></pre>
+  0.820   0.021   0.841 </code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>L1_permuted &lt;- permute_L(gbcd_fits_by_col[[1]], sim_data$LL)
 plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
 <p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-9-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-9-1">
+Past versions of unnamed-chunk-9-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-9-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-9-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>L2_permuted &lt;- permute_L(gbcd_fits_by_col[[2]], sim_data$LL)
 plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
 <p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(gbcd_fits_by_col[[1]], gbcd_fits_by_col[[2]], threshold = 0.99)
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-10-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(gbcd_fits_by_col[[1]], gbcd_fits_by_col[[2]], threshold = 0.8)
 L_est_by_col &lt;- results_by_col$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>L_est_by_col_permuted &lt;- permute_L(L_est_by_col, sim_data$LL)
 L_est_by_col_permuted &lt;- L_est_by_col_permuted[, apply(L_est_by_col_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_col_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col_permuted)), max(abs(L_est_by_col_permuted)), length.out = 50))</code></pre>
 <p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>In this case, the method recovered seven of the ten components.</p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-12-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This is the correlation between the estimate and the true loadings
+matrix</p>
+<pre class="r"><code>diag(cor(L_est_by_col_permuted, sim_data$LL))</code></pre>
+<pre><code>[1] 0.9995250 0.9993972 0.9984350 0.8136923 0.9988429 0.7807317 0.9980312
+[8] 0.9990899 0.9984341</code></pre>
+<p>With a threshold of 0.8, the method recovered nine of the ten
+components. However, two of the components do not exactly match the true
+components. We did get rid of most of the noise.</p>
 </div>
 <div id="stability-selection-via-splitting-rows" class="section level2">
 <h2>Stability Selection via Splitting Rows</h2>
 <p>Now, we try splitting the rows:</p>
 <pre class="r"><code>set.seed(1)
 X_split_by_row &lt;- stability_selection_split_data(sim_data$Y, dim = &#39;rows&#39;)</code></pre>
-<pre class="r"><code>gbcd_fits_by_row &lt;- list()
-for (i in 1:length(X_split_by_row)){
-  gbcd_fits_by_row[[i]] &lt;- gbcd::fit_gbcd(X_split_by_row[[i]], 
-                                   Kmax = 10, 
+<pre class="r"><code>gbcd_fits_by_row_F &lt;- list()
+gbcd_fits_by_row_L &lt;- list()
+for (i in 1:(length(X_split_by_row)-2)){
+  gbcd_fit &lt;- gbcd::fit_gbcd(X_split_by_row[[i]], 
+                                   Kmax = 4, 
                                    prior = ebnm::ebnm_generalized_binary,
-                                   verbose = 0)$L
+                                   verbose = 0)
+  gbcd_fits_by_row_F[[i]] &lt;- gbcd_fit$F$lfc
+  gbcd_fits_by_row_L[[i]] &lt;- gbcd_fit$L
 }</code></pre>
 <pre><code>[1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.000   0.000   0.001 
+  0.001   0.000   0.001 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -920,37 +1113,30 @@ Done.
 Adding factor 2 to flash object...
 Adding factor 3 to flash object...
 Adding factor 4 to flash object...
-Adding factor 5 to flash object...
-Adding factor 6 to flash object...
-Adding factor 7 to flash object...
-Adding factor 8 to flash object...
-Adding factor 9 to flash object...
-Adding factor 10 to flash object...
 Wrapping up...
 Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  5.785   0.190   5.974 
-[1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
-<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
-reached.</code></pre>
-<pre><code>   user  system elapsed 
- 35.470   0.957  37.058 
+  0.582   0.013   0.595 
+[1] &quot;Estimate GEP membership matrix L...&quot;
+   user  system elapsed 
+  1.928   0.022   1.950 
 [1] &quot;Estimate GEP signature matrix F...&quot;
-Backfitting 16 factors (tolerance: 7.45e-05)...
+Backfitting 8 factors (tolerance: 7.45e-04)...
+  Difference between iterations is within 1.0e+02...
+  Difference between iterations is within 1.0e+01...
   Difference between iterations is within 1.0e+00...
   Difference between iterations is within 1.0e-01...
   Difference between iterations is within 1.0e-02...
   Difference between iterations is within 1.0e-03...
-  Difference between iterations is within 1.0e-04...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.538   0.009   0.547 
+  2.050   0.052   2.187 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.003   0.000   0.002 
+  0.001   0.000   0.001 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -958,61 +1144,83 @@ Done.
 Adding factor 2 to flash object...
 Adding factor 3 to flash object...
 Adding factor 4 to flash object...
-Adding factor 5 to flash object...
-Adding factor 6 to flash object...
-Adding factor 7 to flash object...
-Adding factor 8 to flash object...
-Adding factor 9 to flash object...
-Adding factor 10 to flash object...
-Wrapping up...
-Done.</code></pre>
-<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
-reached.</code></pre>
-<pre><code>   user  system elapsed 
-  2.743   0.095   2.842 
-[1] &quot;Estimate GEP membership matrix L...&quot;
-  --Estimate of factor 18 is numerically zero!
-  --Estimate of factor 19 is numerically zero!
-  --Estimate of factor 8 is numerically zero!
-  --Estimate of factor 2 is numerically zero!
-  --Estimate of factor 6 is numerically zero!
-  --Estimate of factor 2 is numerically zero!
-  --Estimate of factor 2 is numerically zero!
-  --Estimate of factor 2 is numerically zero!
-  --Estimate of factor 2 is numerically zero!</code></pre>
-<pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
-reached.</code></pre>
-<pre><code>  --Estimate of factor 5 is numerically zero!
-   user  system elapsed 
- 13.273   0.278  13.761 
-[1] &quot;Estimate GEP signature matrix F...&quot;
-Backfitting 12 factors (tolerance: 1.42e-03)...
-  Difference between iterations is within 1.0e+02...
-  --Estimate of factor 12 is numerically zero!
-  --Estimate of factor 4 is numerically zero!
-  Difference between iterations is within 1.0e+01...
-  Difference between iterations is within 1.0e+00...
-  Difference between iterations is within 1.0e-01...
 Wrapping up...
 Done.
    user  system elapsed 
-  1.665   0.038   1.705 </code></pre>
+  0.511   0.012   0.523 
+[1] &quot;Estimate GEP membership matrix L...&quot;
+   user  system elapsed 
+  1.454   0.024   1.478 
+[1] &quot;Estimate GEP signature matrix F...&quot;
+Backfitting 7 factors (tolerance: 7.45e-04)...
+  Difference between iterations is within 1.0e+01...
+  Difference between iterations is within 1.0e+00...
+  Difference between iterations is within 1.0e-01...
+  Difference between iterations is within 1.0e-02...
+  Difference between iterations is within 1.0e-03...
+Wrapping up...
+Done.
+   user  system elapsed 
+   1.31    0.05    1.36 </code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
-<pre class="r"><code>L1_permuted &lt;- permute_L(gbcd_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-15-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>This is heatmap of the loadings estimate from the second subset:</p>
-<pre class="r"><code>L2_permuted &lt;- permute_L(gbcd_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
+<pre class="r"><code>plot_heatmap(gbcd_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_L[[1]])), max(abs(gbcd_fits_by_row_L[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(gbcd_fits_by_row[[1]], gbcd_fits_by_row[[2]], threshold = 0.99)
-L_est_by_row &lt;- results_by_row$L</code></pre>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-16-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This is heatmap of the loadings estimate from the second subset:</p>
+<pre class="r"><code>plot_heatmap(gbcd_fits_by_row_L[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_L[[2]])), max(abs(gbcd_fits_by_row_L[[2]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>results_by_row &lt;- stability_selection_row_split_post_processing(gbcd_fits_by_row_L[[1]], gbcd_fits_by_row_L[[2]], gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]], threshold = 0.5)
+L_est_by_row &lt;- results_by_row$L
+L_est_by_row &lt;- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), ]</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>L_est_by_row_permuted &lt;- permute_L(L_est_by_row, sim_data$LL)
 L_est_by_row_permuted &lt;- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_row_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-18-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>In this case, the method recovered two of the ten factors.</p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This is the correlation between the estimate and the true loadings
+matrix:</p>
+<pre class="r"><code>apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)</code></pre>
+<pre><code>     GEP7  Baseline      GEP3      GEP2 
+0.8929018 0.8602873 0.9985408 0.8501943 </code></pre>
+<p>With a threshold of 0.5, the method recovered four of the ten
+factors. However, some of the factors do not exactly match the true
+factors.</p>
 </div>
 </div>
 <div id="ebcd" class="section level1">
@@ -1027,27 +1235,62 @@ class="section level2">
 <h2>Stability Selection via Splitting Columns</h2>
 <pre class="r"><code>set.seed(1)
 ebcd_fits_by_col &lt;- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col)-2)){
   ebcd_fits_by_col[[i]] &lt;- ebcd::ebcd(t(X_split_by_col[[i]]), 
                                    Kmax = 20, 
                                    ebnm_fn = ebnm::ebnm_generalized_binary)$EL
 }</code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
-<pre class="r"><code>L1_permuted &lt;- permute_L(ebcd_fits_by_col[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-20-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[1]][order(X_split_by_row[[3]]),], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
-<pre class="r"><code>L2_permuted &lt;- permute_L(ebcd_fits_by_col[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-21-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.99)
+<pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-23-1">
+Past versions of unnamed-chunk-23-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-23-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-23-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.5)
 L_est_by_col &lt;- results_by_col$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>L_est_by_col_permuted &lt;- permute_L(L_est_by_col, sim_data$LL)
 L_est_by_col_permuted &lt;- L_est_by_col_permuted[, apply(L_est_by_col_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_col_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col_permuted)), max(abs(L_est_by_col_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-23-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-25-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>These are the correlations between the estimates and the true factors
 (which are paired to maximize crossproduct similarity):</p>
 <pre class="r"><code>diag(cor(L_est_by_col_permuted, sim_data$LL))</code></pre>
@@ -1058,29 +1301,119 @@ plot_heatmap(L_est_by_col_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&
 <div id="stability-selection-via-splitting-rows-1"
 class="section level2">
 <h2>Stability Selection via Splitting Rows</h2>
-<pre class="r"><code>set.seed(1)
-ebcd_fits_by_row &lt;- list()
-for (i in 1:length(X_split_by_row)){
-  ebcd_fits_by_row[[i]] &lt;- ebcd::ebcd(t(X_split_by_row[[i]]), 
-                                   Kmax = 20, 
-                                   ebnm_fn = ebnm::ebnm_generalized_binary)$EL
+<pre class="r"><code>transform_ebcd_Z &lt;- function(Y, ebcd_obj){
+  Y.svd &lt;- svd(Y)
+  Y.UV &lt;- Y.svd$u %*% t(Y.svd$v)
+  Z_transformed &lt;- Y.UV %*% ebcd_obj$Z
+  return(Z_transformed)
 }</code></pre>
-<p>This is heatmap of the loadings estimate from the first subset:</p>
-<pre class="r"><code>L1_permuted &lt;- permute_L(ebcd_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>This is heatmap of the loadings estimate from the second subset:</p>
-<pre class="r"><code>L2_permuted &lt;- permute_L(ebcd_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-27-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(ebcd_fits_by_row[[1]], ebcd_fits_by_row[[2]], threshold = 0.99)
-L_est_by_row &lt;- results_by_row$L</code></pre>
+<pre class="r"><code>set.seed(1)
+ebcd_fits_by_row_L &lt;- list()
+ebcd_fits_by_row_F &lt;- list()
+for (i in 1:(length(X_split_by_row)-2)){
+  ebcd_fit &lt;- ebcd::ebcd(t(X_split_by_row[[i]]), 
+                                   Kmax = 20, 
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)
+  ebcd_fits_by_row_L[[i]] &lt;- ebcd_fit$EL
+  ebcd_fits_by_row_F[[i]] &lt;- transform_ebcd_Z(t(X_split_by_row[[i]]), ebcd_fit)
+}</code></pre>
+<p>This is a heatmap of the loadings estimate from the first subset:</p>
+<pre class="r"><code>plot_heatmap(ebcd_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row_L[[1]])), max(abs(ebcd_fits_by_row_L[[1]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-29-1">
+Past versions of unnamed-chunk-29-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-29-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-29-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This is a heatmap of the loadings estimate from the second
+subset:</p>
+<pre class="r"><code>plot_heatmap(ebcd_fits_by_row_L[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row_L[[2]])), max(abs(ebcd_fits_by_row_L[[2]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-30-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>results_by_row &lt;- stability_selection_row_split_post_processing(ebcd_fits_by_row_L[[1]], ebcd_fits_by_row_L[[2]], ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]], threshold = 0.5)
+L_est_by_row &lt;- results_by_row$L
+L_est_by_row &lt;- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), ]</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>L_est_by_row_permuted &lt;- permute_L(L_est_by_row, sim_data$LL)
 L_est_by_row_permuted &lt;- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_row_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-29-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>In this case, the method returns only seven of the ten factors.</p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-1">
+Past versions of unnamed-chunk-32-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-32-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This is the correlation between the estimate and the true loadings
+matrix:</p>
+<pre class="r"><code>apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)</code></pre>
+<pre><code>        l         l         l         l         l         l         l 
+0.9955515 0.9886109 0.9975396 0.9988597 0.8408662 0.9921302 0.9188740 </code></pre>
+<p>With a threshold of 0.5, the method returns seven components.
+However, two of the components do not exactly match the true
+components.</p>
 </div>
 </div>
 <div id="codesymnmf" class="section level1">
@@ -1094,66 +1427,183 @@ the method double the true number of components.</p>
 class="section level2">
 <h2>Stability Selection via Splitting Columns</h2>
 <pre class="r"><code>codesymnmf_fits_by_col &lt;- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col) - 2)){
   cov_mat &lt;- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
   codesymnmf_fits_by_col[[i]] &lt;- codesymnmf::codesymnmf(cov_mat, 20)$H
 }</code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>L1_permuted &lt;- permute_L(codesymnmf_fits_by_col[[1]], sim_data$LL)
 plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-35-1">
+Past versions of unnamed-chunk-35-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-35-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-35-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>L2_permuted &lt;- permute_L(codesymnmf_fits_by_col[[2]], sim_data$LL)
 plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.99)
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.8)
 L_est_by_col &lt;- results_by_col$L</code></pre>
-<p>In this case, the method does not return any factors. Reducing the
-similarity threshold to 0.98 allows the method to return four of the ten
-factors. So it seems like the estimates do contain the signal. However,
-perhaps due to the fact the method doesn’t encourage sparsity or is not
-binary, the estimates are not exactly the same across the two
-estimates.</p>
-<pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.98)
-L_est_by_col &lt;- results_by_col$L</code></pre>
-<p>This is a heatmap of the final loadings estimate with a decreased
-threshold:</p>
+<p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>L_est_by_col_permuted &lt;- permute_L(L_est_by_col, sim_data$LL)
 L_est_by_col_permuted &lt;- L_est_by_col_permuted[, apply(L_est_by_col_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_col_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col_permuted)), max(abs(L_est_by_col_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-35-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-38-1">
+Past versions of unnamed-chunk-38-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-38-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-38-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This is the correlation between the estimate and the true loadings
+matrix:</p>
+<pre class="r"><code>apply(cor(L_est_by_col_permuted, sim_data$LL), 1, max)</code></pre>
+<pre><code> [1] 0.9834490 0.9906166 0.9933232 0.9794371 0.9748750 0.9515754 0.9888518
+ [8] 0.9501294 0.9965162 0.9613451 0.8882336 0.7872828 0.8633132</code></pre>
+<p>The method returns 13 factors in this case. Some of the factors look
+like they may be capturing similar effects to other factors, e.g. factor
+12 looks a bit like factor 10. Similarly, factor 11 looks like factor
+9.</p>
 </div>
 <div id="stability-selection-via-splitting-rows-2"
 class="section level2">
 <h2>Stability Selection via Splitting Rows</h2>
-<pre class="r"><code>codesymnmf_fits_by_row &lt;- list()
-for (i in 1:length(X_split_by_row)){
+<pre class="r"><code>PolarU &lt;- function(A) {
+  svdA &lt;- svd(A)
+  out &lt;- svdA$u %*% t(svdA$v)
+  return(out)
+}</code></pre>
+<pre class="r"><code>codesymnmf_fits_by_row_L &lt;- list()
+codesymnmf_fits_by_row_F &lt;- list()
+for (i in 1:(length(X_split_by_row)-2)){
   cov_mat &lt;- tcrossprod(X_split_by_row[[i]])/ncol(X_split_by_row[[i]])
-  codesymnmf_fits_by_row[[i]] &lt;- codesymnmf::codesymnmf(cov_mat, 20)$H
+  codesymnmf_fits_by_row_L[[i]] &lt;- codesymnmf::codesymnmf(cov_mat, 8)$H
+  codesymnmf_fits_by_row_F[[i]] &lt;- PolarU(t(X_split_by_row[[i]]) %*% codesymnmf_fits_by_row_L[[i]])
 }</code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
-<pre class="r"><code>L1_permuted &lt;- permute_L(codesymnmf_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-37-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot_heatmap(codesymnmf_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(codesymnmf_fits_by_row_L[[1]])), max(abs(codesymnmf_fits_by_row_L[[1]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is heatmap of the loadings estimate from the second subset:</p>
-<pre class="r"><code>L2_permuted &lt;- permute_L(codesymnmf_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-38-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(codesymnmf_fits_by_row[[1]], codesymnmf_fits_by_row[[2]], threshold = 0.99)
-L_est_by_row &lt;- results_by_row$L</code></pre>
-<p>In this setting, the method again does not return any factors. The
-method only starts returning factors when the threshold is reduced to
-0.92, so this suggests the estimates are more dissimilar in this
-case.</p>
-<pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(codesymnmf_fits_by_row[[1]], codesymnmf_fits_by_row[[2]], threshold = 0.92)
-L_est_by_row &lt;- results_by_row$L</code></pre>
+<pre class="r"><code>plot_heatmap(codesymnmf_fits_by_row_L[[2]][order(X_split_by_row[[3]]),], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(codesymnmf_fits_by_row_L[[2]])), max(abs(codesymnmf_fits_by_row_L[[2]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-43-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>results_by_row &lt;- stability_selection_row_split_post_processing(codesymnmf_fits_by_row_L[[1]], codesymnmf_fits_by_row_L[[2]], codesymnmf_fits_by_row_F[[1]], codesymnmf_fits_by_row_F[[2]], threshold = 0.6)
+L_est_by_row &lt;- results_by_row$L
+L_est_by_row &lt;- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), , drop = FALSE]</code></pre>
 <p>This is a heatmap of the final loadings estimate with a reduced
 threshold:</p>
 <pre class="r"><code>L_est_by_row_permuted &lt;- permute_L(L_est_by_row, sim_data$LL)
 L_est_by_row_permuted &lt;- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_row_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-41-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-45-1">
+Past versions of unnamed-chunk-45-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-45-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-45-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>This is the correlation between the estimate and the true loadings
+matrix:</p>
+<pre class="r"><code>apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)</code></pre>
+<pre><code>[1] 0.9965497 0.9665367 0.9968250 0.9928538</code></pre>
+<p>With a threshold of 0.6, the method returns four out of the ten
+factors.</p>
 </div>
 </div>
 <div id="ebmfcov" class="section level1">
@@ -1197,7 +1647,7 @@ class="section level2">
 <pre class="r"><code>library(flashier)</code></pre>
 <pre><code>Loading required package: ebnm</code></pre>
 <pre class="r"><code>ebmfcov_fits_by_col &lt;- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col) - 2)){
   cov_mat &lt;- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
   fl &lt;- cov_fit(cov_mat, ebnm_fn = ebnm::ebnm_generalized_binary, Kmax = 20)$fl
   fl_scaled &lt;- ldf(fl)
@@ -1209,71 +1659,222 @@ to take so long.</p>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>L1_permuted &lt;- permute_L(ebmfcov_fits_by_col[[1]], sim_data$LL)
 plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-45-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>These are plots of the factors which appear to be trivial:</p>
+<pre class="r"><code>par(mfrow = c(6, 2), mar = c(2, 2, 2, 2))
+for (i in c(3, 11:20)){
+  plot(L1_permuted[,i])
+}
+par(mfrow = c(1, 1))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-51-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-51-1">
+Past versions of unnamed-chunk-51-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-51-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-51-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>L2_permuted &lt;- permute_L(ebmfcov_fits_by_col[[2]], sim_data$LL)
 plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-52-1">
+Past versions of unnamed-chunk-52-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-52-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/7599303ed012d8a52e5f6dac66fb0deefc30ec3e/docs/figure/sparse_overlap_setting.Rmd/unnamed-chunk-52-1.png" target="_blank">7599303</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-09-12
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>These are plots of the factors which appear to be trivial:</p>
+<pre class="r"><code>par(mfrow = c(5, 2), mar = c(2, 2, 2, 2))
+for (i in c(11:18, 20)){
+  plot(L2_permuted[,i])
+}
+par(mfrow = c(1, 1))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
 <pre class="r"><code>results_by_col &lt;- stability_selection_post_processing(ebmfcov_fits_by_col[[1]], ebmfcov_fits_by_col[[2]], threshold = 0.99)
 L_est_by_col &lt;- results_by_col$L</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>L_est_by_col_permuted &lt;- permute_L(L_est_by_col, sim_data$LL)
 L_est_by_col_permuted &lt;- L_est_by_col_permuted[, apply(L_est_by_col_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_col_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col_permuted)), max(abs(L_est_by_col_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-48-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-55-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is a heatmap of the factors in the final loadings estimate that
 appear to be trivial:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_col_permuted[, c(3, 6, 11:19)], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col_permuted[, c(3, 6, 11:19)])), max(abs(L_est_by_col_permuted[, c(3, 6, 11:19)])), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-49-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>So it appears that the method still returns since both estimates have
-factors of this type. I think this is something specific to EBMFcov and
-the generalized binary prior when <code>Kmax</code> is large, so perhaps
-another type of ad-hoc procedure is needed to get rid of these extra
-factors.</p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-56-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This is the correlation between the estimate and the true loadings
+matrix:</p>
+<pre class="r"><code>apply(cor(L_est_by_col_permuted, sim_data$LL), 1, max)</code></pre>
+<pre><code> [1] 0.9977232 0.9980556 0.2361222 0.9977731 0.9969051 0.2357691 0.9988014
+ [8] 0.9983588 0.9975605 0.9955091 0.2374745 0.2369430 0.2369289 0.2373146
+[15] 0.2366769 0.2370380 0.2364656 0.2367231 0.2379130</code></pre>
+<p>The final loadings estimate has 19 factors. However, many of them
+appear to be near zero.</p>
+<p>This is the correlation between the trivial factors in the first
+estimate and the trivial factors in the second estimate:</p>
+<pre class="r"><code>cor(L1_permuted[,c(3, 11:20)], L2_permuted[,c(11:18,20)])</code></pre>
+<pre><code>           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
+ [1,] 0.1659487 0.1658889 0.1661303 0.1660192 0.1659394 0.1660940 0.1654419
+ [2,] 0.1656201 0.1655651 0.1657870 0.1656851 0.1656118 0.1657542 0.1651540
+ [3,] 0.1657003 0.1656444 0.1658700 0.1657664 0.1656919 0.1658365 0.1652265
+ [4,] 0.1656754 0.1656178 0.1658503 0.1657434 0.1656666 0.1658157 0.1651871
+ [5,] 0.1656803 0.1656226 0.1658552 0.1657483 0.1656715 0.1658206 0.1651919
+ [6,] 0.1657382 0.1656819 0.1659088 0.1658046 0.1657296 0.1658751 0.1652616
+ [7,] 0.1657351 0.1656770 0.1659116 0.1658037 0.1657262 0.1658766 0.1652425
+ [8,] 0.1657883 0.1657315 0.1659607 0.1658554 0.1657797 0.1659266 0.1653069
+ [9,] 0.1657844 0.1657259 0.1659621 0.1658535 0.1657754 0.1659268 0.1652885
+[10,] 0.1658563 0.1657988 0.1660306 0.1659240 0.1658475 0.1659960 0.1653695
+[11,] 0.1658626 0.1658034 0.1660422 0.1659323 0.1658534 0.1660065 0.1653610
+           [,8]      [,9]
+ [1,] 0.1661310 0.1650401
+ [2,] 0.1657887 0.1647828
+ [3,] 0.1658715 0.1648496
+ [4,] 0.1658515 0.1647993
+ [5,] 0.1658564 0.1648040
+ [6,] 0.1659102 0.1648826
+ [7,] 0.1659127 0.1648514
+ [8,] 0.1659620 0.1649242
+ [9,] 0.1659631 0.1648948
+[10,] 0.1660317 0.1649829
+[11,] 0.1660431 0.1649632</code></pre>
+<p>For comparison, this is the cosine similarity matrix of the trivial
+factors:</p>
+<pre class="r"><code>compute_cosine_sim_matrix(L1_permuted[,c(3, 11:20)], L2_permuted[,c(11:18,20)])</code></pre>
+<pre><code>           [,1]      [,2]      [,3]      [,4]      [,5]      [,6]      [,7]
+ [1,] 0.9979407 0.9979410 0.9979420 0.9979421 0.9979421 0.9979428 0.9979429
+ [2,] 0.9961788 0.9961792 0.9961806 0.9961807 0.9961807 0.9961816 0.9961818
+ [3,] 0.9966266 0.9966270 0.9966283 0.9966284 0.9966284 0.9966293 0.9966294
+ [4,] 0.9968671 0.9968674 0.9968687 0.9968688 0.9968688 0.9968696 0.9968697
+ [5,] 0.9968792 0.9968795 0.9968808 0.9968809 0.9968809 0.9968817 0.9968818
+ [6,] 0.9968262 0.9968265 0.9968279 0.9968279 0.9968280 0.9968288 0.9968289
+ [7,] 0.9971330 0.9971333 0.9971345 0.9971346 0.9971346 0.9971354 0.9971355
+ [8,] 0.9970827 0.9970830 0.9970843 0.9970844 0.9970844 0.9970852 0.9970853
+ [9,] 0.9973334 0.9973337 0.9973349 0.9973350 0.9973350 0.9973357 0.9973358
+[10,] 0.9973990 0.9973993 0.9974005 0.9974006 0.9974006 0.9974013 0.9974014
+[11,] 0.9976451 0.9976454 0.9976465 0.9976466 0.9976466 0.9976473 0.9976474
+           [,8]      [,9]
+ [1,] 0.9979444 0.9979435
+ [2,] 0.9961839 0.9961827
+ [3,] 0.9966314 0.9966303
+ [4,] 0.9968717 0.9968705
+ [5,] 0.9968838 0.9968827
+ [6,] 0.9968308 0.9968297
+ [7,] 0.9971374 0.9971363
+ [8,] 0.9970871 0.9970861
+ [9,] 0.9973376 0.9973366
+[10,] 0.9974032 0.9974022
+[11,] 0.9976491 0.9976481</code></pre>
+<p>This is a plot of one of the trivial factors from the first estimate
+and one of the trivial factors from the second estimate:</p>
+<pre class="r"><code>plot(x = L1_permuted[,11], L2_permuted[,11])</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-60-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This suggests that looking at the correlation and the cosine
+similarity leads to different results. When looking at cosine
+similarity, these trivial factors are kept. But if we were looking at
+correlation, they would not be kept. Maybe I should try centering the
+data and looking at the cosine similarity (which I have defined for zero
+vectors)? This is something for me to keep in mind.</p>
 </div>
 <div id="stability-selection-via-splitting-rows-3"
 class="section level2">
 <h2>Stability Selection via Splitting Rows</h2>
-<pre class="r"><code>ebmfcov_fits_by_row &lt;- list()
-for (i in 1:length(X_split_by_row)){
+<pre class="r"><code>ebmfcov_fits_by_row_L &lt;- list()
+ebmfcov_fits_by_row_F &lt;- list()
+for (i in 1:(length(X_split_by_row)-2)){
   cov_mat &lt;- tcrossprod(X_split_by_row[[i]])/ncol(X_split_by_row[[i]])
   fl &lt;- cov_fit(cov_mat, ebnm_fn = ebnm::ebnm_generalized_binary, Kmax = 20)$fl
   fl_scaled &lt;- ldf(fl)
   L_scaled &lt;- fl_scaled$L %*% diag(sqrt(fl_scaled$D))
-  ebmfcov_fits_by_row[[i]] &lt;- L_scaled
+  ebmfcov_fits_by_row_L[[i]] &lt;- L_scaled
+  ebmfcov_fits_by_row_F[[i]] &lt;- PolarU(t(X_split_by_row[[i]]) %*% ebmfcov_fits_by_row_L[[i]])
 }</code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
-<pre class="r"><code>L1_permuted &lt;- permute_L(ebmfcov_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-51-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>plot_heatmap(ebmfcov_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebmfcov_fits_by_row_L[[1]])), max(abs(ebmfcov_fits_by_row_L[[1]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-62-1.png" width="672" style="display: block; margin: auto;" /></p>
 <p>This is heatmap of the loadings estimate from the second subset:</p>
-<pre class="r"><code>L2_permuted &lt;- permute_L(ebmfcov_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-52-1.png" width="672" style="display: block; margin: auto;" /></p>
-<pre class="r"><code>results_by_row &lt;- stability_selection_post_processing(ebmfcov_fits_by_row[[1]], ebmfcov_fits_by_row[[2]], threshold = 0.99)
-L_est_by_row &lt;- results_by_row$L</code></pre>
+<pre class="r"><code>plot_heatmap(ebmfcov_fits_by_row_L[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebmfcov_fits_by_row_L[[2]])), max(abs(ebmfcov_fits_by_row_L[[2]])), length.out = 50))</code></pre>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-63-1.png" width="672" style="display: block; margin: auto;" /></p>
+<pre class="r"><code>results_by_row &lt;- stability_selection_row_split_post_processing(ebmfcov_fits_by_row_L[[1]], ebmfcov_fits_by_row_L[[2]], ebmfcov_fits_by_row_F[[1]], ebmfcov_fits_by_row_F[[2]], threshold = 0.5)
+L_est_by_row &lt;- results_by_row$L
+L_est_by_row &lt;- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), , drop = FALSE]</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>L_est_by_row_permuted &lt;- permute_L(L_est_by_row, sim_data$LL)
 L_est_by_row_permuted &lt;- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2, function(x){sum(x^2)}) &gt; 10^(-10)]
 plot_heatmap(L_est_by_row_permuted, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))</code></pre>
-<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-54-1.png" width="672" style="display: block; margin: auto;" /></p>
-<p>The method returns three of the ten factors. Again, the method also
-returns some of the extra factors.</p>
+<p><img src="figure/sparse_overlap_setting.Rmd/unnamed-chunk-65-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>This is the correlation of the estimate and true loadings matrix:</p>
+<pre class="r"><code>apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)</code></pre>
+<pre><code>[1] 0.8572479 0.9280368 0.9991655 0.9992952 0.9976947 0.9989436 0.9770544</code></pre>
+<p>With a threshold of 0.5, the method returns seven factors.</p>
 </div>
 </div>
 <div id="observations" class="section level1">
 <h1>Observations</h1>
-<p>As expected, the variant of stability selection which split the data
-via the rows struggled more than the variant which split the data via
-the columns. I thought it was interesting that EBCD with the
-column-splitting based stability selection was able to return all ten
-factors – this suggests that when given a higher <code>Kmax</code>, EBCD
-will return extra factors on top of the correct factors (as opposed to
-representing the matrix with a characteristically different
-representation that utilizes its full factor allotment). CoDesymNMF did
-not return any factors with either stability selection method. This may
-be a result of the lack of a sparsity penalty in CoDesymNMF.</p>
+<p>As expected, this setting is the hardest of the four settings. The
+only method that was able to recover all ten components accurately is
+EBCD with the column-split stability selection.</p>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
