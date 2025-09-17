@@ -114,7 +114,7 @@ X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
 
 ```{r}
 gbcd_fits_by_col <- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col)-2)){
   gbcd_fits_by_col[[i]] <- gbcd::fit_gbcd(X_split_by_col[[i]], 
                                    Kmax = 10, 
                                    prior = ebnm::ebnm_generalized_binary,
@@ -135,7 +135,7 @@ plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-m
 ```
 
 ```{r}
-results_by_col <- stability_selection_post_processing(gbcd_fits_by_col[[1]], gbcd_fits_by_col[[2]], threshold = 0.99)
+results_by_col <- stability_selection_post_processing(gbcd_fits_by_col[[1]], gbcd_fits_by_col[[2]], threshold = 0.8)
 L_est_by_col <- results_by_col$L
 ```
 
@@ -146,7 +146,12 @@ L_est_by_col_permuted <- L_est_by_col_permuted[, apply(L_est_by_col_permuted, 2,
 plot_heatmap(L_est_by_col_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col_permuted)), max(abs(L_est_by_col_permuted)), length.out = 50))
 ```
 
-In this case, the method recovered seven of the ten components.
+This is the correlation between the estimate and the true loadings matrix
+```{r}
+diag(cor(L_est_by_col_permuted, sim_data$LL))
+```
+
+With a threshold of 0.8, the method recovered nine of the ten components. However, two of the components do not exactly match the true components. We did get rid of most of the noise.
 
 ## Stability Selection via Splitting Rows
 
@@ -157,30 +162,32 @@ X_split_by_row <- stability_selection_split_data(sim_data$Y, dim = 'rows')
 ```
 
 ```{r}
-gbcd_fits_by_row <- list()
-for (i in 1:length(X_split_by_row)){
-  gbcd_fits_by_row[[i]] <- gbcd::fit_gbcd(X_split_by_row[[i]], 
-                                   Kmax = 10, 
+gbcd_fits_by_row_F <- list()
+gbcd_fits_by_row_L <- list()
+for (i in 1:(length(X_split_by_row)-2)){
+  gbcd_fit <- gbcd::fit_gbcd(X_split_by_row[[i]], 
+                                   Kmax = 4, 
                                    prior = ebnm::ebnm_generalized_binary,
-                                   verbose = 0)$L
+                                   verbose = 0)
+  gbcd_fits_by_row_F[[i]] <- gbcd_fit$F$lfc
+  gbcd_fits_by_row_L[[i]] <- gbcd_fit$L
 }
 ```
 
 This is heatmap of the loadings estimate from the first subset:
 ```{r}
-L1_permuted <- permute_L(gbcd_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))
+plot_heatmap(gbcd_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_L[[1]])), max(abs(gbcd_fits_by_row_L[[1]])), length.out = 50))
 ```
 
 This is heatmap of the loadings estimate from the second subset:
 ```{r}
-L2_permuted <- permute_L(gbcd_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))
+plot_heatmap(gbcd_fits_by_row_L[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_L[[2]])), max(abs(gbcd_fits_by_row_L[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_row <- stability_selection_post_processing(gbcd_fits_by_row[[1]], gbcd_fits_by_row[[2]], threshold = 0.99)
+results_by_row <- stability_selection_row_split_post_processing(gbcd_fits_by_row_L[[1]], gbcd_fits_by_row_L[[2]], gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]], threshold = 0.5)
 L_est_by_row <- results_by_row$L
+L_est_by_row <- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), ]
 ```
 
 This is a heatmap of the final loadings estimate:
@@ -190,7 +197,12 @@ L_est_by_row_permuted <- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2,
 plot_heatmap(L_est_by_row_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))
 ```
 
-In this case, the method recovered two of the ten factors.
+This is the correlation between the estimate and the true loadings matrix:
+```{r}
+apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)
+```
+
+With a threshold of 0.5, the method recovered four of the ten factors. However, some of the factors do not exactly match the true factors.
 
 # EBCD
 
@@ -201,7 +213,7 @@ In this section, I try stability selection with the GBCD method. When given a `K
 ```{r}
 set.seed(1)
 ebcd_fits_by_col <- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col)-2)){
   ebcd_fits_by_col[[i]] <- ebcd::ebcd(t(X_split_by_col[[i]]), 
                                    Kmax = 20, 
                                    ebnm_fn = ebnm::ebnm_generalized_binary)$EL
@@ -210,18 +222,16 @@ for (i in 1:length(X_split_by_col)){
 
 This is heatmap of the loadings estimate from the first subset:
 ```{r}
-L1_permuted <- permute_L(ebcd_fits_by_col[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))
+plot_heatmap(ebcd_fits_by_col[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))
 ```
 
 This is a heatmap of the loadings estimate from the second subset:
 ```{r}
-L2_permuted <- permute_L(ebcd_fits_by_col[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))
+plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.99)
+results_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.5)
 L_est_by_col <- results_by_col$L
 ```
 
@@ -242,30 +252,41 @@ The method recovers all ten components nearly perfectly.
 ## Stability Selection via Splitting Rows
 
 ```{r}
-set.seed(1)
-ebcd_fits_by_row <- list()
-for (i in 1:length(X_split_by_row)){
-  ebcd_fits_by_row[[i]] <- ebcd::ebcd(t(X_split_by_row[[i]]), 
-                                   Kmax = 20, 
-                                   ebnm_fn = ebnm::ebnm_generalized_binary)$EL
+transform_ebcd_Z <- function(Y, ebcd_obj){
+  Y.svd <- svd(Y)
+  Y.UV <- Y.svd$u %*% t(Y.svd$v)
+  Z_transformed <- Y.UV %*% ebcd_obj$Z
+  return(Z_transformed)
 }
 ```
 
-This is heatmap of the loadings estimate from the first subset:
 ```{r}
-L1_permuted <- permute_L(ebcd_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))
+set.seed(1)
+ebcd_fits_by_row_L <- list()
+ebcd_fits_by_row_F <- list()
+for (i in 1:(length(X_split_by_row)-2)){
+  ebcd_fit <- ebcd::ebcd(t(X_split_by_row[[i]]), 
+                                   Kmax = 20, 
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)
+  ebcd_fits_by_row_L[[i]] <- ebcd_fit$EL
+  ebcd_fits_by_row_F[[i]] <- transform_ebcd_Z(t(X_split_by_row[[i]]), ebcd_fit)
+}
 ```
 
-This is heatmap of the loadings estimate from the second subset:
+This is a heatmap of the loadings estimate from the first subset:
 ```{r}
-L2_permuted <- permute_L(ebcd_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))
+plot_heatmap(ebcd_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_L[[1]])), max(abs(ebcd_fits_by_row_L[[1]])), length.out = 50))
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(ebcd_fits_by_row_L[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_L[[2]])), max(abs(ebcd_fits_by_row_L[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_row <- stability_selection_post_processing(ebcd_fits_by_row[[1]], ebcd_fits_by_row[[2]], threshold = 0.99)
+results_by_row <- stability_selection_row_split_post_processing(ebcd_fits_by_row_L[[1]], ebcd_fits_by_row_L[[2]], ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]], threshold = 0.5)
 L_est_by_row <- results_by_row$L
+L_est_by_row <- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), ]
 ```
 
 This is a heatmap of the final loadings estimate:
@@ -275,7 +296,12 @@ L_est_by_row_permuted <- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2,
 plot_heatmap(L_est_by_row_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))
 ```
 
-In this case, the method returns only seven of the ten factors.
+This is the correlation between the estimate and the true loadings matrix:
+```{r}
+apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)
+```
+
+With a threshold of 0.5, the method returns seven components. However, two of the components do not exactly match the true components.
 
 # CoDesymNMF
 
@@ -285,7 +311,7 @@ In this section, I try stability selection with the CoDesymNMF method. Similar t
 
 ```{r}
 codesymnmf_fits_by_col <- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col) - 2)){
   cov_mat <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
   codesymnmf_fits_by_col[[i]] <- codesymnmf::codesymnmf(cov_mat, 20)$H
 }
@@ -304,56 +330,58 @@ plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-m
 ```
 
 ```{r}
-results_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.99)
+results_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.8)
 L_est_by_col <- results_by_col$L
 ```
 
-In this case, the method does not return any factors. Reducing the similarity threshold to 0.98 allows the method to return four of the ten factors. So it seems like the estimates do contain the signal. However, perhaps due to the fact the method doesn't encourage sparsity or is not binary, the estimates are not exactly the same across the two estimates. 
-
-```{r}
-results_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.98)
-L_est_by_col <- results_by_col$L
-```
-
-This is a heatmap of the final loadings estimate with a decreased threshold:
+This is a heatmap of the final loadings estimate:
 ```{r}
 L_est_by_col_permuted <- permute_L(L_est_by_col, sim_data$LL)
 L_est_by_col_permuted <- L_est_by_col_permuted[, apply(L_est_by_col_permuted, 2, function(x){sum(x^2)}) > 10^(-10)]
 plot_heatmap(L_est_by_col_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col_permuted)), max(abs(L_est_by_col_permuted)), length.out = 50))
 ```
 
+This is the correlation between the estimate and the true loadings matrix:
+```{r}
+apply(cor(L_est_by_col_permuted, sim_data$LL), 1, max)
+```
+
+The method returns 13 factors in this case. Some of the factors look like they may be capturing similar effects to other factors, e.g. factor 12 looks a bit like factor 10. Similarly, factor 11 looks like factor 9.
+
 ## Stability Selection via Splitting Rows
 
 ```{r}
-codesymnmf_fits_by_row <- list()
-for (i in 1:length(X_split_by_row)){
+PolarU <- function(A) {
+  svdA <- svd(A)
+  out <- svdA$u %*% t(svdA$v)
+  return(out)
+}
+```
+
+```{r}
+codesymnmf_fits_by_row_L <- list()
+codesymnmf_fits_by_row_F <- list()
+for (i in 1:(length(X_split_by_row)-2)){
   cov_mat <- tcrossprod(X_split_by_row[[i]])/ncol(X_split_by_row[[i]])
-  codesymnmf_fits_by_row[[i]] <- codesymnmf::codesymnmf(cov_mat, 20)$H
+  codesymnmf_fits_by_row_L[[i]] <- codesymnmf::codesymnmf(cov_mat, 8)$H
+  codesymnmf_fits_by_row_F[[i]] <- PolarU(t(X_split_by_row[[i]]) %*% codesymnmf_fits_by_row_L[[i]])
 }
 ```
 
 This is heatmap of the loadings estimate from the first subset:
 ```{r}
-L1_permuted <- permute_L(codesymnmf_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))
+plot_heatmap(codesymnmf_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_row_L[[1]])), max(abs(codesymnmf_fits_by_row_L[[1]])), length.out = 50))
 ```
 
 This is heatmap of the loadings estimate from the second subset:
 ```{r}
-L2_permuted <- permute_L(codesymnmf_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))
+plot_heatmap(codesymnmf_fits_by_row_L[[2]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_row_L[[2]])), max(abs(codesymnmf_fits_by_row_L[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_row <- stability_selection_post_processing(codesymnmf_fits_by_row[[1]], codesymnmf_fits_by_row[[2]], threshold = 0.99)
+results_by_row <- stability_selection_row_split_post_processing(codesymnmf_fits_by_row_L[[1]], codesymnmf_fits_by_row_L[[2]], codesymnmf_fits_by_row_F[[1]], codesymnmf_fits_by_row_F[[2]], threshold = 0.6)
 L_est_by_row <- results_by_row$L
-```
-
-In this setting, the method again does not return any factors. The method only starts returning factors when the threshold is reduced to 0.92, so this suggests the estimates are more dissimilar in this case.
-
-```{r}
-results_by_row <- stability_selection_post_processing(codesymnmf_fits_by_row[[1]], codesymnmf_fits_by_row[[2]], threshold = 0.92)
-L_est_by_row <- results_by_row$L
+L_est_by_row <- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), , drop = FALSE]
 ```
 
 This is a heatmap of the final loadings estimate with a reduced threshold:
@@ -362,6 +390,13 @@ L_est_by_row_permuted <- permute_L(L_est_by_row, sim_data$LL)
 L_est_by_row_permuted <- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2, function(x){sum(x^2)}) > 10^(-10)]
 plot_heatmap(L_est_by_row_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))
 ```
+
+This is the correlation between the estimate and the true loadings matrix:
+```{r}
+apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)
+```
+
+With a threshold of 0.6, the method returns four out of the ten factors.
 
 # EBMFcov
 
@@ -402,7 +437,7 @@ library(flashier)
 
 ```{r}
 ebmfcov_fits_by_col <- list()
-for (i in 1:length(X_split_by_col)){
+for (i in 1:(length(X_split_by_col) - 2)){
   cov_mat <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
   fl <- cov_fit(cov_mat, ebnm_fn = ebnm::ebnm_generalized_binary, Kmax = 20)$fl
   fl_scaled <- ldf(fl)
@@ -419,10 +454,28 @@ L1_permuted <- permute_L(ebmfcov_fits_by_col[[1]], sim_data$LL)
 plot_heatmap(L1_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))
 ```
 
+These are plots of the factors which appear to be trivial:
+```{r}
+par(mfrow = c(6, 2), mar = c(2, 2, 2, 2))
+for (i in c(3, 11:20)){
+  plot(L1_permuted[,i])
+}
+par(mfrow = c(1, 1))
+```
+
 This is a heatmap of the loadings estimate from the second subset:
 ```{r}
 L2_permuted <- permute_L(ebmfcov_fits_by_col[[2]], sim_data$LL)
 plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))
+```
+
+These are plots of the factors which appear to be trivial:
+```{r}
+par(mfrow = c(5, 2), mar = c(2, 2, 2, 2))
+for (i in c(11:18, 20)){
+  plot(L2_permuted[,i])
+}
+par(mfrow = c(1, 1))
 ```
 
 ```{r}
@@ -442,36 +495,59 @@ This is a heatmap of the factors in the final loadings estimate that appear to b
 plot_heatmap(L_est_by_col_permuted[, c(3, 6, 11:19)], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col_permuted[, c(3, 6, 11:19)])), max(abs(L_est_by_col_permuted[, c(3, 6, 11:19)])), length.out = 50))
 ```
 
-So it appears that the method still returns since both estimates have factors of this type. I think this is something specific to EBMFcov and the generalized binary prior when `Kmax` is large, so perhaps another type of ad-hoc procedure is needed to get rid of these extra factors.
+This is the correlation between the estimate and the true loadings matrix:
+```{r}
+apply(cor(L_est_by_col_permuted, sim_data$LL), 1, max)
+```
+
+The final loadings estimate has 19 factors. However, many of them appear to be near zero.
+
+This is the correlation between the trivial factors in the first estimate and the trivial factors in the second estimate:
+```{r}
+cor(L1_permuted[,c(3, 11:20)], L2_permuted[,c(11:18,20)])
+```
+
+For comparison, this is the cosine similarity matrix of the trivial factors:
+```{r}
+compute_cosine_sim_matrix(L1_permuted[,c(3, 11:20)], L2_permuted[,c(11:18,20)])
+```
+
+This is a plot of one of the trivial factors from the first estimate and one of the trivial factors from the second estimate:
+```{r}
+plot(x = L1_permuted[,11], L2_permuted[,11])
+```
+
+This suggests that looking at the correlation and the cosine similarity leads to different results. When looking at cosine similarity, these trivial factors are kept. But if we were looking at correlation, they would not be kept. Maybe I should try centering the data and looking at the cosine similarity (which I have defined for zero vectors)? This is something for me to keep in mind.
 
 ## Stability Selection via Splitting Rows
 
 ```{r}
-ebmfcov_fits_by_row <- list()
-for (i in 1:length(X_split_by_row)){
+ebmfcov_fits_by_row_L <- list()
+ebmfcov_fits_by_row_F <- list()
+for (i in 1:(length(X_split_by_row)-2)){
   cov_mat <- tcrossprod(X_split_by_row[[i]])/ncol(X_split_by_row[[i]])
   fl <- cov_fit(cov_mat, ebnm_fn = ebnm::ebnm_generalized_binary, Kmax = 20)$fl
   fl_scaled <- ldf(fl)
   L_scaled <- fl_scaled$L %*% diag(sqrt(fl_scaled$D))
-  ebmfcov_fits_by_row[[i]] <- L_scaled
+  ebmfcov_fits_by_row_L[[i]] <- L_scaled
+  ebmfcov_fits_by_row_F[[i]] <- PolarU(t(X_split_by_row[[i]]) %*% ebmfcov_fits_by_row_L[[i]])
 }
 ```
 
 This is heatmap of the loadings estimate from the first subset:
 ```{r}
-L1_permuted <- permute_L(ebmfcov_fits_by_row[[1]], sim_data$LL)
-plot_heatmap(L1_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L1_permuted)), max(abs(L1_permuted)), length.out = 50))
+plot_heatmap(ebmfcov_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebmfcov_fits_by_row_L[[1]])), max(abs(ebmfcov_fits_by_row_L[[1]])), length.out = 50))
 ```
 
 This is heatmap of the loadings estimate from the second subset:
 ```{r}
-L2_permuted <- permute_L(ebmfcov_fits_by_row[[2]], sim_data$LL)
-plot_heatmap(L2_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L2_permuted)), max(abs(L2_permuted)), length.out = 50))
+plot_heatmap(ebmfcov_fits_by_row_L[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebmfcov_fits_by_row_L[[2]])), max(abs(ebmfcov_fits_by_row_L[[2]])), length.out = 50))
 ```
 
 ```{r}
-results_by_row <- stability_selection_post_processing(ebmfcov_fits_by_row[[1]], ebmfcov_fits_by_row[[2]], threshold = 0.99)
+results_by_row <- stability_selection_row_split_post_processing(ebmfcov_fits_by_row_L[[1]], ebmfcov_fits_by_row_L[[2]], ebmfcov_fits_by_row_F[[1]], ebmfcov_fits_by_row_F[[2]], threshold = 0.5)
 L_est_by_row <- results_by_row$L
+L_est_by_row <- L_est_by_row[order(c(X_split_by_row[[3]], X_split_by_row[[4]])), , drop = FALSE]
 ```
 
 This is a heatmap of the final loadings estimate:
@@ -481,7 +557,12 @@ L_est_by_row_permuted <- L_est_by_row_permuted[, apply(L_est_by_row_permuted, 2,
 plot_heatmap(L_est_by_row_permuted, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_row_permuted)), max(abs(L_est_by_row_permuted)), length.out = 50))
 ```
 
-The method returns three of the ten factors. Again, the method also returns some of the extra factors.
+This is the correlation of the estimate and true loadings matrix:
+```{r}
+apply(cor(L_est_by_row_permuted, sim_data$LL), 1, max)
+```
+
+With a threshold of 0.5, the method returns seven factors.
 
 # Observations
-As expected, the variant of stability selection which split the data via the rows struggled more than the variant which split the data via the columns. I thought it was interesting that EBCD with the column-splitting based stability selection was able to return all ten factors -- this suggests that when given a higher `Kmax`, EBCD will return extra factors on top of the correct factors (as opposed to representing the matrix with a characteristically different representation that utilizes its full factor allotment). CoDesymNMF did not return any factors with either stability selection method. This may be a result of the lack of a sparsity penalty in CoDesymNMF.
+As expected, this setting is the hardest of the four settings. The only method that was able to recover all ten components accurately is EBCD with the column-split stability selection.
