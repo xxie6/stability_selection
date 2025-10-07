@@ -533,15 +533,15 @@ project makes it easier to run your code on other machines.</p>
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontreedc690407e6037afa1a4c1f65653bafb06dceaff4targetblankdc69040a">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree3be461d8161886186fe7105480faff6a8653c85btargetblank3be461da">
 <span class="glyphicon glyphicon-ok text-success"
 aria-hidden="true"></span> <strong>Repository version:</strong>
-<a href="https://github.com/xxie6/stability_selection/tree/dc690407e6037afa1a4c1f65653bafb06dceaff4" target="_blank">dc69040</a>
+<a href="https://github.com/xxie6/stability_selection/tree/3be461d8161886186fe7105480faff6a8653c85b" target="_blank">3be461d</a>
 </a>
 </p>
 </div>
 <div
-id="strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontreedc690407e6037afa1a4c1f65653bafb06dceaff4targetblankdc69040a"
+id="strongRepositoryversionstrongahrefhttpsgithubcomxxie6stabilityselectiontree3be461d8161886186fe7105480faff6a8653c85btargetblank3be461da"
 class="panel-collapse collapse">
 <div class="panel-body">
 <p>
@@ -551,7 +551,7 @@ reproducibility.
 </p>
 <p>
 The results in this page were generated with repository version
-<a href="https://github.com/xxie6/stability_selection/tree/dc690407e6037afa1a4c1f65653bafb06dceaff4" target="_blank">dc69040</a>.
+<a href="https://github.com/xxie6/stability_selection/tree/3be461d8161886186fe7105480faff6a8653c85b" target="_blank">3be461d</a>.
 See the <em>Past versions</em> tab to see a history of the changes made
 to the R Markdown and HTML files.
 </p>
@@ -620,6 +620,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/3be461d8161886186fe7105480faff6a8653c85b/analysis/assignment_based_stability_selection.Rmd" target="_blank">3be461d</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+<td>
+Update hungarian-algo based method
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/xxie6/stability_selection/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/assignment_based_stability_selection.html" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -721,16 +755,24 @@ library(flashier)</code></pre>
   assignment_problem &lt;- RcppHungarian::HungarianSolver(-1*cosine_sim_matrix)
   pairings &lt;- assignment_problem$pairs
   
+  # remove things that were not paired
+  no_pair &lt;- pairings[,2] == 0
+  pairings &lt;- pairings[!(no_pair), , drop = FALSE]
+  
   # filter pairings
   pairing_similarities &lt;- cosine_sim_matrix[pairings]
   pairings.keep &lt;- pairing_similarities &gt; threshold
-  pairings &lt;- pairings[pairings.keep,]
+  pairings &lt;- pairings[pairings.keep, , drop = FALSE]
   K &lt;- nrow(pairings)
   
   # compute final estimate
-  L_final &lt;- matrix(0, nrow = nrow(L1), ncol = K)
-  for(i in 1:K){
-    L_final[,i] &lt;- rowMeans(cbind(L1[, pairings[i,1]], L2[, pairings[i,2]]))
+  if (K &gt; 0){
+    L_final &lt;- matrix(0, nrow = nrow(L1), ncol = K)
+    for(i in 1:K){
+      L_final[,i] &lt;- rowMeans(cbind(L1[, pairings[i,1]], L2[, pairings[i,2]]))
+    }
+  } else {
+    L_final &lt;- matrix(0, nrow = nrow(L1), ncol = 1)
   }
   
   return(L_final)
@@ -772,6 +814,43 @@ sim_data &lt;- sim_star_data(sim_args)</code></pre>
 <p>This is a heatmap of the true loadings matrix:</p>
 <pre class="r"><code>plot_heatmap(sim_data$LL)</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unbal_star_true_loadings-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unbal_star_true_loadings-1">
+Past versions of unbal_star_true_loadings-1.png
+</button>
+</p>
+<div id="fig-unbal_star_true_loadings-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unbal_star_true_loadings-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div id="gbcd" class="section level2">
 <h2>GBCD</h2>
 <p>In this section, I test the method with GBCD.</p>
@@ -788,7 +867,7 @@ for (i in 1:(length(X_split_by_col)/2)){
 }</code></pre>
 <pre><code>[1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.004   0.000   0.005 
+  0.004   0.000   0.004 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -801,19 +880,19 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  1.230   0.029   1.260 
+  1.292   0.034   1.333 
 [1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  9.509   0.157   9.754 
+  9.862   0.225  10.192 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 4 factors (tolerance: 1.19e-03)...
   Difference between iterations is within 1.0e-02...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.308   0.008   0.321 
+  0.301   0.005   0.309 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
   0.003   0.000   0.003 
@@ -829,10 +908,10 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  0.712   0.019   0.736 
+  0.715   0.020   0.742 
 [1] &quot;Estimate GEP membership matrix L...&quot;
    user  system elapsed 
-  2.207   0.025   2.306 
+  2.186   0.033   2.238 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 7 factors (tolerance: 1.19e-03)...
   --Estimate of factor 6 is numerically zero!
@@ -844,14 +923,88 @@ Backfitting 7 factors (tolerance: 1.19e-03)...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.555   0.011   0.620 </code></pre>
+  0.538   0.008   0.550 </code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_col[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_col[[1]])), max(abs(gbcd_fits_by_col[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-1-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-1-1">
+Past versions of unnamed-chunk-1-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-1-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-1-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_col[[2]])), max(abs(gbcd_fits_by_col[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-2-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-2-1">
+Past versions of unnamed-chunk-2-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-2-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-2-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The first four factors of the estimates are highly similar. The
 second estimate has three extra factors.</p>
 <p>These are histograms of the similarities:</p>
@@ -861,6 +1014,43 @@ for(i in 1:nrow(L1_L2_cosine_sim_mat)){
   hist(L1_L2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-4-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-4-1">
+Past versions of unnamed-chunk-4-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-4-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-4-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>Now we apply stability selection. From the histograms above, I
 decided to apply stability selection with a threshold of 0.8.</p>
@@ -869,6 +1059,43 @@ L_est_by_col &lt;- stability_selection_post_processing(gbcd_fits_by_col[[1]], gb
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_col, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-6-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-6-1">
+Past versions of unnamed-chunk-6-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-6-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-6-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimate and the true
 loadings:</p>
 <pre class="r"><code>apply(cor(L_est_by_col, sim_data$LL), 1, max)</code></pre>
@@ -903,12 +1130,12 @@ Adding factor 4 to flash object...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.440   0.016   0.456 
+  0.469   0.022   0.500 
 [1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  2.394   0.041   2.436 
+  2.513   0.060   2.695 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 6 factors (tolerance: 1.19e-03)...
   --Estimate of factor 5 is numerically zero!
@@ -918,7 +1145,7 @@ Backfitting 6 factors (tolerance: 1.19e-03)...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.949   0.014   0.963 
+  0.993   0.019   1.036 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
   0.002   0.000   0.002 
@@ -932,13 +1159,13 @@ Adding factor 4 to flash object...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.587   0.026   0.613 
+  0.595   0.023   0.622 
 [1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>  --Estimate of factor 4 is numerically zero!
    user  system elapsed 
-  2.222   0.041   2.265 
+  2.252   0.049   2.342 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 6 factors (tolerance: 1.19e-03)...
   --Estimate of factor 5 is numerically zero!
@@ -948,13 +1175,87 @@ Backfitting 6 factors (tolerance: 1.19e-03)...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.862   0.015   0.878 </code></pre>
+  0.902   0.016   0.931 </code></pre>
 <p>This is heatmap of the factor estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[1]])), max(abs(gbcd_fits_by_row_F[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-10-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-10-1">
+Past versions of unnamed-chunk-10-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-10-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-10-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is heatmap of the factor estimate from the second subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-11-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-11-1">
+Past versions of unnamed-chunk-11-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-11-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-11-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>For both estimates, the last two factors appear to be close to the
 zero vector. Let’s take a closer look.</p>
 <p>This is a plot of the last two factor estimates from the first
@@ -964,6 +1265,43 @@ for (i in 5:6){
   plot(gbcd_fits_by_row_F[[1]][,i], ylab = &#39;Factor Estimate&#39;)
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-12-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-12-1">
+Past versions of unnamed-chunk-12-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-12-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-12-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>This is a plot of the last two factor estimates from the first
 subset:</p>
@@ -972,6 +1310,43 @@ for (i in 5:6){
   plot(gbcd_fits_by_row_F[[2]][,i], ylab = &#39;Factor Estimate&#39;)
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-13-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-13-1">
+Past versions of unnamed-chunk-13-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-13-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-13-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>Some of these factors are zero vectors. So we should remove these.
 (It seems like GBCD does not have a check for whether factors are zero.
@@ -985,10 +1360,84 @@ I think this is something that Joon came across once?).</p>
 <p>This is heatmap of the new factor estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[1]])), max(abs(gbcd_fits_by_row_F[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-16-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-16-1">
+Past versions of unnamed-chunk-16-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-16-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-16-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is heatmap of the new factor estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-17-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-17-1">
+Past versions of unnamed-chunk-17-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-17-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-17-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>These are histograms of the similarities:</p>
 <pre class="r"><code>F1_F2_cosine_sim_mat &lt;- compute_cosine_sim_matrix(gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]])</code></pre>
 <pre class="r"><code>par(mfrow = c(2,2))
@@ -996,6 +1445,43 @@ for(i in 1:nrow(F1_F2_cosine_sim_mat)){
   hist(F1_F2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-19-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-19-1">
+Past versions of unnamed-chunk-19-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-19-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-19-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>This is the cosine similarity matrix:</p>
 <pre class="r"><code>F1_F2_cosine_sim_mat</code></pre>
@@ -1012,6 +1498,43 @@ F_est &lt;- stability_selection_post_processing(gbcd_fits_by_row_F[[1]], gbcd_fi
 <p>This is a heatmap of the final factor estimate:</p>
 <pre class="r"><code>plot_heatmap(F_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(F_est)), max(abs(F_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-22-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-22-1">
+Past versions of unnamed-chunk-22-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-22-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-22-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimated factors and true
 factors:</p>
 <pre class="r"><code>apply(cor(F_est, sim_data$FF), 1, max)</code></pre>
@@ -1027,6 +1550,43 @@ class="math inline">\(L\)</span> using non-negative least squares.</p>
 L_est &lt;- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)</code></pre>
 <pre class="r"><code>plot_heatmap(L_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-26-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-26-1">
+Past versions of unnamed-chunk-26-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-26-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-26-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The <span class="math inline">\(L\)</span> estimate has the main
 components. Now, I run backfitting with flash on the data matrix with
 <span class="math inline">\(F\)</span> fixed to the consensus estimate
@@ -1046,6 +1606,43 @@ Nullchecking 4 factors...
 Done.</code></pre>
 <pre class="r"><code>plot_heatmap(flash_estimate_L$L_pm)</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-28-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-28-1">
+Past versions of unnamed-chunk-28-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-28-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-28-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The one backfit iteration helps make the estimate more sparse,
 shrinking the small values to zero.</p>
 </div>
@@ -1067,10 +1664,84 @@ for (i in 1:(length(X_split_by_col)/2)){
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-31-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-31-1">
+Past versions of unnamed-chunk-31-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-31-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-31-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-32-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-32-1">
+Past versions of unnamed-chunk-32-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-32-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-32-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Factor pairs (1,4), (2,1), (3,3), and (4,2) are highly similar. Both
 estimates have four extra factors which visually don’t seem to correlate
 with each other.</p>
@@ -1081,6 +1752,43 @@ for(i in 1:nrow(L1_L2_cosine_sim_mat)){
   hist(L1_L2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-34-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-34-1">
+Past versions of unnamed-chunk-34-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-34-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-34-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>Now, let’s apply stability selection. Based off the histograms above,
 I chose a similarity threshold of 0.8.</p>
@@ -1089,6 +1797,43 @@ L_est_by_col &lt;- stability_selection_post_processing(ebcd_fits_by_col[[1]], eb
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_col, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-36-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-36-1">
+Past versions of unnamed-chunk-36-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-36-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-36-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimate and the true
 loadings:</p>
 <pre class="r"><code>apply(cor(L_est_by_col, sim_data$LL), 1, max)</code></pre>
@@ -1119,9 +1864,83 @@ for (i in 1:(length(X_split_by_row)-2)){
 <p>This is heatmap of the factor estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_row_F[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row_F[[1]])), max(abs(ebcd_fits_by_row_F[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-41-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-41-1">
+Past versions of unnamed-chunk-41-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-41-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-41-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is heatmap of the factor estimate from the second subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_row_F[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row_F[[2]])), max(abs(ebcd_fits_by_row_F[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-42-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-42-1">
+Past versions of unnamed-chunk-42-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-42-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-42-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>These are histograms of the similarities:</p>
 <pre class="r"><code>F1_F2_cosine_sim_mat &lt;- compute_cosine_sim_matrix(ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]])</code></pre>
 <pre class="r"><code>par(mfrow = c(2,4))
@@ -1129,6 +1948,43 @@ for(i in 1:nrow(F1_F2_cosine_sim_mat)){
   hist(F1_F2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-44-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-44-1">
+Past versions of unnamed-chunk-44-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-44-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-44-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>Let’s apply stability selection. Again, based off the histograms
 above, I chose a threshold of 0.8.</p>
@@ -1137,6 +1993,43 @@ F_est &lt;- stability_selection_post_processing(ebcd_fits_by_row_F[[1]], ebcd_fi
 <p>This is a heatmap of the final factor estimate:</p>
 <pre class="r"><code>plot_heatmap(F_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(F_est)), max(abs(F_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-46-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-46-1">
+Past versions of unnamed-chunk-46-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-46-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-46-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimated factors and the true
 factors:</p>
 <pre class="r"><code>apply(cor(F_est, sim_data$FF), 1, max)</code></pre>
@@ -1153,6 +2046,43 @@ squares.</p>
 L_est &lt;- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)</code></pre>
 <pre class="r"><code>plot_heatmap(L_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-50-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-50-1">
+Past versions of unnamed-chunk-50-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-50-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-50-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The loadings estimate contains the main components. Now, I run
 backfit with EBCD for one iteration. I use the generalized binary prior
 on the loadings.</p>
@@ -1184,6 +2114,43 @@ ebcd_estimate_L &lt;- ebcd_fit_L_given_Z(t(sim_data$Y), F_est, L_est, ebnm::ebnm
 <p>This is a heatmap of the loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(ebcd_estimate_L, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_estimate_L)), max(abs(ebcd_estimate_L)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-53-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-53-1">
+Past versions of unnamed-chunk-53-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-53-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-53-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>One caveat is the factor estimate is not exactly orthogonal. So I try
 a procedure where I compute the closest orthogonal matrix for our <span
 class="math inline">\(F\)</span> estimate, and then use that to obtain
@@ -1210,11 +2177,85 @@ L_est_orthog &lt;- t(NNLM::nnlm(x = F_est_orthog , y = t(sim_data$Y))$coefficien
 estimate.</p>
 <pre class="r"><code>plot_heatmap(L_est_orthog, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_orthog)), max(abs(L_est_orthog)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-57-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-57-1">
+Past versions of unnamed-chunk-57-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-57-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-57-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Now, we apply one iteration of backfit with EBCD.</p>
 <pre class="r"><code>ebcd_estimate_L_orthog &lt;- ebcd_fit_L_given_Z(t(sim_data$Y), F_est_orthog, L_est_orthog, ebnm::ebnm_generalized_binary, maxiter = 1)</code></pre>
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(ebcd_estimate_L_orthog, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_estimate_L_orthog)), max(abs(ebcd_estimate_L_orthog)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-59-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-59-1">
+Past versions of unnamed-chunk-59-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-59-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-59-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The results do not drastically change.</p>
 </div>
 </div>
@@ -1233,6 +2274,43 @@ sim_data &lt;- sim_star_data(sim_args)</code></pre>
 <p>This is a heatmap of the true loadings matrix:</p>
 <pre class="r"><code>plot_heatmap(sim_data$LL)</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-61-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-61-1">
+Past versions of unnamed-chunk-61-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-61-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-61-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <div id="gbcd-1" class="section level2">
 <h2>GBCD</h2>
 <div id="split-by-column-2" class="section level3">
@@ -1261,7 +2339,7 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  4.822   0.110   4.936 
+  4.955   0.110   5.139 
 [1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.
@@ -1270,7 +2348,7 @@ reached.
 Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
- 15.116   0.172  15.336 
+ 15.489   0.202  15.827 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 6 factors (tolerance: 1.19e-03)...
   Difference between iterations is within 1.0e+00...
@@ -1290,10 +2368,10 @@ An update to factor 2 decreased the objective by 7.276e-11.
 Wrapping up...
 Done.
    user  system elapsed 
-  8.628   0.159   8.848 
+  8.727   0.190   8.954 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.003   0.000   0.003 
+  0.004   0.000   0.003 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -1306,7 +2384,7 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  2.530   0.044   2.606 
+  2.643   0.061   2.711 
 [1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.
@@ -1315,7 +2393,7 @@ reached.
 Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
- 14.542   0.144  14.812 
+ 14.664   0.215  14.947 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 6 factors (tolerance: 1.19e-03)...
   Difference between iterations is within 1.0e+01...
@@ -1327,14 +2405,88 @@ Backfitting 6 factors (tolerance: 1.19e-03)...
 Wrapping up...
 Done.
    user  system elapsed 
-  5.741   0.100   5.847 </code></pre>
+  5.817   0.144   5.980 </code></pre>
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_col[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_col[[1]])), max(abs(gbcd_fits_by_col[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-64-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-64-1">
+Past versions of unnamed-chunk-64-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-64-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-64-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_col[[2]])), max(abs(gbcd_fits_by_col[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-65-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-65-1">
+Past versions of unnamed-chunk-65-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-65-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-65-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>An interesting observation is that GBCD yields duplicate factors (In
 my experience, it usually does not). I wonder if the corresponding
 factors are zero factors.</p>
@@ -1345,6 +2497,43 @@ for(i in 1:nrow(L1_L2_cosine_sim_mat)){
   hist(L1_L2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-67-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-67-1">
+Past versions of unnamed-chunk-67-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-67-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-67-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>Now we apply stability selection. I again chose a similarity
 threshold of 0.8.</p>
@@ -1353,6 +2542,43 @@ L_est_by_col &lt;- stability_selection_post_processing(gbcd_fits_by_col[[1]], gb
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_col, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-69-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-69-1">
+Past versions of unnamed-chunk-69-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-69-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-69-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimate and the true
 loadings:</p>
 <pre class="r"><code>apply(cor(L_est_by_col, sim_data$LL), 1, max)</code></pre>
@@ -1379,7 +2605,7 @@ for (i in 1:(length(X_split_by_row)/2)){
 }</code></pre>
 <pre><code>[1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
-  0.001   0.000   0.002 
+  0.002   0.000   0.002 
 [1] &quot;Initialize GEP membership matrix L...&quot;
 Adding factor 1 to flash object...
 Wrapping up...
@@ -1392,10 +2618,10 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  1.640   0.066   1.718 
+  1.650   0.074   1.729 
 [1] &quot;Estimate GEP membership matrix L...&quot;
    user  system elapsed 
-  2.797   0.052   2.899 
+  2.774   0.049   2.836 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 5 factors (tolerance: 1.19e-03)...
   --Estimate of factor 5 is numerically zero!
@@ -1404,7 +2630,7 @@ Backfitting 5 factors (tolerance: 1.19e-03)...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.683   0.010   0.698 
+  0.689   0.014   0.705 
 [1] &quot;Form cell by cell covariance matrix...&quot;
    user  system elapsed 
   0.002   0.000   0.002 
@@ -1420,12 +2646,12 @@ Done.</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  1.097   0.042   1.143 
+  1.098   0.039   1.139 
 [1] &quot;Estimate GEP membership matrix L...&quot;</code></pre>
 <pre><code>Warning in report.maxiter.reached(verbose.lvl): Maximum number of iterations
 reached.</code></pre>
 <pre><code>   user  system elapsed 
-  2.318   0.045   2.376 
+  2.300   0.041   2.345 
 [1] &quot;Estimate GEP signature matrix F...&quot;
 Backfitting 7 factors (tolerance: 1.19e-03)...
   --Estimate of factor 7 is numerically zero!
@@ -1436,13 +2662,87 @@ Backfitting 7 factors (tolerance: 1.19e-03)...
 Wrapping up...
 Done.
    user  system elapsed 
-  0.918   0.021   0.940 </code></pre>
+  0.914   0.019   0.934 </code></pre>
 <p>This is heatmap of the factor estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[1]])), max(abs(gbcd_fits_by_row_F[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-73-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-73-1">
+Past versions of unnamed-chunk-73-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-73-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-73-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is heatmap of the factor estimate from the second subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-74-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-74-1">
+Past versions of unnamed-chunk-74-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-74-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-74-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>For both estimates, the last two factors appear to be close to the
 zero vector. Let’s take a closer look.</p>
 <p>This is a plot of the last two factor estimates from the first
@@ -1453,6 +2753,43 @@ for (i in 5){
 }
 par(mfrow = c(1,1))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-75-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-75-1">
+Past versions of unnamed-chunk-75-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-75-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-75-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a plot of the last three factor estimates from the first
 subset:</p>
 <pre class="r"><code>par(mfrow = c(2,2))
@@ -1461,6 +2798,43 @@ for (i in 5:7){
 }
 par(mfrow = c(1,1))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-76-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-76-1">
+Past versions of unnamed-chunk-76-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-76-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-76-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Similar to the previous analyses, we remove the factors which are
 essentially zero vectors.</p>
 <pre class="r"><code>for (j in 1:2){
@@ -1472,10 +2846,84 @@ essentially zero vectors.</p>
 <p>This is heatmap of the new factor estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[1]])), max(abs(gbcd_fits_by_row_F[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-79-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-79-1">
+Past versions of unnamed-chunk-79-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-79-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-79-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is heatmap of the new factor estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-80-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-80-1">
+Past versions of unnamed-chunk-80-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-80-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-80-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>These are histograms of the similarities:</p>
 <pre class="r"><code>F1_F2_cosine_sim_mat &lt;- compute_cosine_sim_matrix(gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]])</code></pre>
 <pre class="r"><code>par(mfrow = c(2,2))
@@ -1483,6 +2931,43 @@ for(i in 1:nrow(F1_F2_cosine_sim_mat)){
   hist(F1_F2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-82-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-82-1">
+Past versions of unnamed-chunk-82-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-82-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-82-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>This is the similarity matrix:</p>
 <pre class="r"><code>F1_F2_cosine_sim_mat</code></pre>
@@ -1498,6 +2983,43 @@ F_est &lt;- stability_selection_post_processing(gbcd_fits_by_row_F[[1]], gbcd_fi
 <p>This is a heatmap of the final factor estimate:</p>
 <pre class="r"><code>plot_heatmap(F_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(F_est)), max(abs(F_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-85-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-85-1">
+Past versions of unnamed-chunk-85-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-85-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-85-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimated factors and the true
 factors:</p>
 <pre class="r"><code>apply(cor(F_est, sim_data$FF), 1, max)</code></pre>
@@ -1513,6 +3035,43 @@ using non-negative least squares.</p>
 L_est &lt;- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)</code></pre>
 <pre class="r"><code>plot_heatmap(L_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-89-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-89-1">
+Past versions of unnamed-chunk-89-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-89-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-89-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The <span class="math inline">\(L\)</span> estimate has the main
 components. Now, I run backfitting with flash on the data matrix with
 <span class="math inline">\(F\)</span> fixed to the consensus estimate
@@ -1531,6 +3090,43 @@ Nullchecking 4 factors...
 Done.</code></pre>
 <pre class="r"><code>plot_heatmap(flash_estimate_L$L_pm)</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-91-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-91-1">
+Past versions of unnamed-chunk-91-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-91-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-91-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>The one backfit iteration helps make the estimate more sparse,
 shrinking the small values to zero.</p>
 </div>
@@ -1551,10 +3147,84 @@ for (i in 1:(length(X_split_by_col)/2)){
 <p>This is heatmap of the loadings estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-94-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-94-1">
+Past versions of unnamed-chunk-94-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-94-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-94-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is a heatmap of the loadings estimate from the second
 subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-95-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-95-1">
+Past versions of unnamed-chunk-95-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-95-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-95-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>These are histograms of the similarities:</p>
 <pre class="r"><code>L1_L2_cosine_sim_mat &lt;- compute_cosine_sim_matrix(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]])</code></pre>
 <pre class="r"><code>par(mfrow = c(2,4))
@@ -1562,6 +3232,43 @@ for(i in 1:nrow(L1_L2_cosine_sim_mat)){
   hist(L1_L2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-97-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-97-1">
+Past versions of unnamed-chunk-97-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-97-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-97-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>Now, let’s apply stability selection. I again use a similarity
 threshold of 0.8.</p>
@@ -1570,6 +3277,43 @@ L_est_by_col &lt;- stability_selection_post_processing(ebcd_fits_by_col[[1]], eb
 <p>This is a heatmap of the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est_by_col, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-99-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-99-1">
+Past versions of unnamed-chunk-99-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-99-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-99-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimate and the true
 loadings:</p>
 <pre class="r"><code>apply(cor(L_est_by_col, sim_data$LL), 1, max)</code></pre>
@@ -1594,9 +3338,83 @@ for (i in 1:(length(X_split_by_row)-2)){
 <p>This is heatmap of the factor estimate from the first subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_row_F[[1]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row_F[[1]])), max(abs(ebcd_fits_by_row_F[[1]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-104-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-104-1">
+Past versions of unnamed-chunk-104-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-104-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-104-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is heatmap of the factor estimate from the second subset:</p>
 <pre class="r"><code>plot_heatmap(ebcd_fits_by_row_F[[2]], colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_fits_by_row_F[[2]])), max(abs(ebcd_fits_by_row_F[[2]])), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-105-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-105-1">
+Past versions of unnamed-chunk-105-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-105-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-105-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>These are histograms of the similarities:</p>
 <pre class="r"><code>F1_F2_cosine_sim_mat &lt;- compute_cosine_sim_matrix(ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]])</code></pre>
 <pre class="r"><code>par(mfrow = c(2,4))
@@ -1604,6 +3422,43 @@ for(i in 1:nrow(F1_F2_cosine_sim_mat)){
   hist(F1_F2_cosine_sim_mat[i,], xlab = &quot;&quot;, ylab = &quot;&quot;, main = paste(&#39;factor&#39;,i))
 }</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-107-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-107-1">
+Past versions of unnamed-chunk-107-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-107-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-107-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>par(mfrow = c(1,1))</code></pre>
 <p>Let’s apply stability selection</p>
 <pre class="r"><code>set.seed(1)
@@ -1611,6 +3466,43 @@ F_est &lt;- stability_selection_post_processing(ebcd_fits_by_row_F[[1]], ebcd_fi
 <p>This is a heatmap of the final factor estimate:</p>
 <pre class="r"><code>plot_heatmap(F_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(F_est)), max(abs(F_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-109-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-109-1">
+Past versions of unnamed-chunk-109-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-109-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-109-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the correlation between the estimated factors and the true
 factors:</p>
 <pre class="r"><code>apply(cor(F_est, sim_data$FF), 1, max)</code></pre>
@@ -1627,12 +3519,86 @@ L_est &lt;- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)</code></pr
 <p>This is a heatmap of the loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(L_est, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-113-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-113-1">
+Past versions of unnamed-chunk-113-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-113-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-113-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Now, I run one backfit iteration with EBCD.</p>
 <pre class="r"><code># issue: F is not orthogonal here; is that okay?
 ebcd_estimate_L &lt;- ebcd_fit_L_given_Z(t(sim_data$Y), F_est, L_est, ebnm::ebnm_generalized_binary, maxiter = 1)</code></pre>
 <p>This is a heatmap of the final loadings estimate.</p>
 <pre class="r"><code>plot_heatmap(ebcd_estimate_L, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_estimate_L)), max(abs(ebcd_estimate_L)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-116-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-116-1">
+Past versions of unnamed-chunk-116-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-116-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-116-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>This is the version of the <span class="math inline">\(L\)</span>
 estimation procedure which uses an orthogonal <span
 class="math inline">\(F\)</span> estimate:</p>
@@ -1643,10 +3609,84 @@ L_est_orthog &lt;- t(NNLM::nnlm(x = F_est_orthog , y = t(sim_data$Y))$coefficien
 squares:</p>
 <pre class="r"><code>plot_heatmap(L_est_orthog, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(L_est_orthog)), max(abs(L_est_orthog)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-120-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-120-1">
+Past versions of unnamed-chunk-120-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-120-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-120-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <pre class="r"><code>ebcd_estimate_L_orthog &lt;- ebcd_fit_L_given_Z(t(sim_data$Y), F_est_orthog, L_est_orthog, ebnm::ebnm_generalized_binary, maxiter = 1)</code></pre>
 <p>This is the final loadings estimate:</p>
 <pre class="r"><code>plot_heatmap(ebcd_estimate_L_orthog, colors_range = c(&#39;blue&#39;,&#39;gray96&#39;,&#39;red&#39;), brks = seq(-max(abs(ebcd_estimate_L_orthog)), max(abs(ebcd_estimate_L_orthog)), length.out = 50))</code></pre>
 <p><img src="figure/assignment_based_stability_selection.Rmd/unnamed-chunk-122-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>
+<button type="button" class="btn btn-default btn-xs btn-workflowr btn-workflowr-fig" data-toggle="collapse" data-target="#fig-unnamed-chunk-122-1">
+Past versions of unnamed-chunk-122-1.png
+</button>
+</p>
+<div id="fig-unnamed-chunk-122-1" class="collapse">
+<div class="table-responsive">
+<table class="table table-condensed table-hover">
+<thead>
+<tr>
+<th>
+Version
+</th>
+<th>
+Author
+</th>
+<th>
+Date
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>
+<a href="https://github.com/xxie6/stability_selection/blob/d5fec0536f34c9b2493bb27fa2d5167c6b50c7ff/docs/figure/assignment_based_stability_selection.Rmd/unnamed-chunk-122-1.png" target="_blank">d5fec05</a>
+</td>
+<td>
+Annie Xie
+</td>
+<td>
+2025-10-07
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
