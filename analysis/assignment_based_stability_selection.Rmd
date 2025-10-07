@@ -100,16 +100,24 @@ stability_selection_post_processing <- function(L1, L2, threshold=0.99){
   assignment_problem <- RcppHungarian::HungarianSolver(-1*cosine_sim_matrix)
   pairings <- assignment_problem$pairs
   
+  # remove things that were not paired
+  no_pair <- pairings[,2] == 0
+  pairings <- pairings[!(no_pair), , drop = FALSE]
+  
   # filter pairings
   pairing_similarities <- cosine_sim_matrix[pairings]
   pairings.keep <- pairing_similarities > threshold
-  pairings <- pairings[pairings.keep,]
+  pairings <- pairings[pairings.keep, , drop = FALSE]
   K <- nrow(pairings)
   
   # compute final estimate
-  L_final <- matrix(0, nrow = nrow(L1), ncol = K)
-  for(i in 1:K){
-    L_final[,i] <- rowMeans(cbind(L1[, pairings[i,1]], L2[, pairings[i,2]]))
+  if (K > 0){
+    L_final <- matrix(0, nrow = nrow(L1), ncol = K)
+    for(i in 1:K){
+      L_final[,i] <- rowMeans(cbind(L1[, pairings[i,1]], L2[, pairings[i,2]]))
+    }
+  } else {
+    L_final <- matrix(0, nrow = nrow(L1), ncol = 1)
   }
   
   return(L_final)
