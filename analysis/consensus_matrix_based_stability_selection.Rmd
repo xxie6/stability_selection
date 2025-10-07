@@ -1,0 +1,194 @@
+---
+title: "consensus_matrix_based_stability_selection"
+author: "Annie Xie"
+date: "2025-10-01"
+output: 
+  workflowr::wflow_html:
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+
+In this analysis, I try a stability selection method similar to Consensus Clustering and Consensus Community Detection (with two splits).
+
+```{r load_packages, message = FALSE, warning = FALSE}
+library(dplyr)
+library(ggplot2)
+library(pheatmap)
+library(flashier)
+```
+
+```{r load_viz_code}
+source('code/visualization_functions.R')
+```
+
+# Stability Selection Code
+```{r split_data_code}
+stability_selection_split_data <- function(X, dim = c('rows', 'columns')){
+
+  if (dim == 'rows'){
+    n <- nrow(X)
+    n1 <- ceiling(n/2)
+    # n2 <- floor(nrow(X)/2)
+  } else if (dim == 'columns'){
+    n <- ncol(X)
+    n1 <- ceiling(n/2)
+    # n2 <- floor(ncol(X)/2)
+  } else {
+    stop('Wrong input for dim')
+  }
+
+  subset1 <- sample(n, size = n1, replace = FALSE)
+  if (dim == 'columns'){
+    X1 <- X[,subset1]
+    X2 <- X[,-(subset1)]
+  } else { # dim = 'rows'
+    X1 <- X[subset1,]
+    X2 <- X[-(subset1),]
+  }
+  return(list(X1, X2, subset1, setdiff(c(1:n), subset1)))
+}
+```
+
+```{r selection_code}
+
+consensus_clustering_stability_selection <- function(fits_L, args){
+  m <- length(fits_L)
+  
+  L_concat <- do.call(cbind, fits_L)
+  L_concat <- L_concat[, apply(L_concat, 2, function(x){sum(x^2)}) > 10^(-10)]
+  num_fac_total <- ncol(L_concat)
+  n <- nrow(L_concat)
+  
+  consensus_mat <- matrix(0, nrow = n, ncol = n)
+  for(i in 1:num_fac_total){
+    consensus_mat <- consensus_mat + tcrossprod(L_concat[, i, drop = TRUE])
+  }
+  
+  # filter out similarities
+  consensus_mat_unfiltered <- consensus_mat
+  consensus_mat[consensus_mat < args$threshold] <- 0
+  
+  return(list(consensus_mat = consensus_mat, consensus_mat_unfiltered = consensus_mat_unfiltered))
+}
+```
+
+# Unbalanced Nonoverlap
+
+In this section, I test out the method in the unbalanced non-overlapping setting.
+
+```{r sim_star_code}
+sim_star_data <- function(args) {
+  set.seed(args$seed)
+  
+  n <- sum(args$pop_sizes)
+  p <- args$n_genes
+  K <- length(args$pop_sizes)
+  
+  FF <- matrix(rnorm(K * p, sd = rep(args$branch_sds, each = p)), ncol = K)
+  
+  LL <- matrix(0, nrow = n, ncol = K)
+  for (k in 1:K) {
+    vec <- rep(0, K)
+    vec[k] <- 1
+    LL[, k] <- rep(vec, times = args$pop_sizes)
+  }
+  
+  E <- matrix(rnorm(n * p, sd = args$indiv_sd), nrow = n)
+  Y <- LL %*% t(FF) + E
+  YYt <- (1/p)*tcrossprod(Y)
+  
+  return(list(Y = Y, YYt = YYt, LL = LL, FF = FF, K = ncol(LL)))
+}
+```
+
+```{r sim_star_data}
+pop_sizes <- c(20,50,30,60)
+n_genes <- 1000
+branch_sds <- rep(2,4)
+indiv_sd <- 1
+seed <- 1
+sim_args = list(pop_sizes = pop_sizes, branch_sds = branch_sds, indiv_sd = indiv_sd, n_genes = n_genes, seed = seed)
+sim_data <- sim_star_data(sim_args)
+```
+
+This is a heatmap of the true loadings matrix:
+```{r unbal_star_true_loadings}
+plot_heatmap(sim_data$LL)
+```
+
+# EBCD
+
+## Test EBCD on true LL'
+
+```{r}
+ebcd_fit_L <- ebcd::ebcd(S = tcrossprod(sim_data$LL), 
+                                   Kmax = 8, 
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)$EL
+```
+
+This is a heatmap of the loadings estimate from EBCD on true $LL'$:
+```{r}
+plot_heatmap(ebcd_fit_L, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fit_L)), max(abs(ebcd_fit_L)), length.out = 50))
+```
+
+## Split by Column
+
+```{r}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r}
+set.seed(1)
+ebcd_fits_by_col <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  ebcd_fits_by_col[[i]] <- ebcd::ebcd(t(X_split_by_col[[i]]), 
+                                   Kmax = 8, 
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)$EL
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(ebcd_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))
+```
+
+```{r}
+set.seed(1)
+ebcd_col_consensus_mat_results <- consensus_clustering_stability_selection(list(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]]), args = list(threshold = 1))
+```
+
+```{r}
+plot_heatmap(ebcd_col_consensus_mat_results$consensus_mat, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_col_consensus_mat_results$consensus_mat)), max(abs(ebcd_col_consensus_mat_results$consensus_mat)), length.out = 50))
+```
+
+```{r}
+set.seed(1)
+ebcd_fits_by_col <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  ebcd_fits_by_col[[i]] <- ebcd::ebcd(S = ebcd_col_consensus_mat_results$consensus_mat, 
+                                   Kmax = 8, 
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)$EL
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(ebcd_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))
+```
+
+My thought here was that if the similarity matrix was "denoised" in a sense, then the EBCD method would not need the additional factors. But it seems like getting a matrix that is "denoised" enough is hard to do in practice.
+
