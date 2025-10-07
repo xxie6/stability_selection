@@ -11,7 +11,7 @@ editor_options:
 
 # Introduction
 
-In this analysis, I try a stability selection method similar to Consensus NMF (with two splits).
+In this analysis, I try a stability selection method based on the Hungarian Algorithm.
 
 ```{r load_packages, message = FALSE, warning = FALSE}
 library(dplyr)
