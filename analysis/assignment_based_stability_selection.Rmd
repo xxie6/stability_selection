@@ -25,21 +25,7 @@ source('code/visualization_functions.R')
 ```
 
 ```{r cosine_sim_code}
-compute_cosine_sim_matrix <- function(L1, L2){
-  norms1 <- apply(L1, 2, function(x){sqrt(sum(x^2))})
-  norms1[norms1 == 0] <- Inf
-
-  norms2 <- apply(L2, 2, function(x){sqrt(sum(x^2))})
-  norms2[norms2 == 0] <- Inf
-
-  L1_normalized <- t(t(L1)/norms1)
-  L2_normalized <- t(t(L2)/norms2)
-
-  #compute matrix of cosine similarities
-  cosine_sim_matrix <- crossprod(L1_normalized, L2_normalized)
-
-  return(cosine_sim_matrix)
-}
+source('code/compute_cosine_sim_matrix.R')
 ```
 
 # Stability Selection Code
@@ -92,10 +78,6 @@ stability_selection_post_processing <- function(L1, L2, threshold=0.99){
   
   # compute similarity
   cosine_sim_matrix <- compute_cosine_sim_matrix(L1, L2)
-  
-  # find pairings
-  # assignment_problem <- lpSolve::lp.assign(cosine_sim_matrix, direction = "max")
-  # pairings <- which(assignment_problem$solution == 1, arr.ind = TRUE)
   
   assignment_problem <- RcppHungarian::HungarianSolver(-1*cosine_sim_matrix)
   pairings <- assignment_problem$pairs
@@ -282,7 +264,8 @@ for (i in 5:6){
 par(mfrow = c(1,1))
 ```
 
-Some of these factors are zero vectors. So we should remove these. (It seems like GBCD does not have a check for whether factors are zero. I think this is something that Joon came across once?).
+Some of these factors are zero vectors. So we should remove these. (It seems like GBCD does not have a check for whether factors are zero. I think this is something that Joon came across once?). Note that removing the zero factors yields two factor estimates with four factors each, meaning the method selected the correct number of factors.
+
 ```{r}
 for (j in 1:2){
   idx.keep <- apply(gbcd_fits_by_row_F[[j]], 2, function(x){sqrt(sum(x^2))}) > 10^(-10)
@@ -290,7 +273,7 @@ for (j in 1:2){
 }
 ```
 
-I also normalize all of factors to have l2 norm = 1.
+I also normalize all of factors to have l2 norm = 1. (Though the cosine similarity is scale-invariant so this should not affect the results).
 ```{r}
 gbcd_fits_by_row_F <- lapply(gbcd_fits_by_row_F, function(x){t(t(x)/sqrt(colSums(x^2)))})
 ```
@@ -311,7 +294,7 @@ F1_F2_cosine_sim_mat <- compute_cosine_sim_matrix(gbcd_fits_by_row_F[[1]], gbcd_
 ```
 
 ```{r}
-par(mfrow = c(2,2))
+par(mfrow = c(2,2), mar = c(3,3,2,2))
 for(i in 1:nrow(F1_F2_cosine_sim_mat)){
   hist(F1_F2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
 }
@@ -323,7 +306,7 @@ This is the cosine similarity matrix:
 F1_F2_cosine_sim_mat
 ```
 
-Now, we apply stability selection. After analyzing the cosine similarity matrix and histograms, I again chose a similarity threshold of 0.8.
+Now, we apply stability selection. After analyzing the cosine similarity matrix and histograms, I again chose a similarity threshold of 0.8. Note that in this case, the gap between similar pairs and dissimilar pairs is quite large, so a much lower threshold would still have yielded the same results.
 ```{r}
 set.seed(1)
 F_est <- stability_selection_post_processing(gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]], threshold = 0.8)
@@ -417,7 +400,7 @@ for(i in 1:nrow(L1_L2_cosine_sim_mat)){
 par(mfrow = c(1,1))
 ```
 
-Now, let's apply stability selection. Based off the histograms above, I chose a similarity threshold of 0.8.
+Now, let's apply stability selection. Based off the histograms above, I chose a similarity threshold of 0.8. Again, the gap between similar and dissimilar pairs is quite large, so I could have gone with a lower threshold (I think 0.4 is the lowest I can go without picking up extra factors).
 ```{r}
 set.seed(1)
 L_est_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.8)
@@ -597,6 +580,67 @@ plot_heatmap(ebcd_estimate_L_orthog, colors_range = c('blue','gray96','red'), br
 
 The results do not drastically change.
 
+## CoDesymNMF
+
+### Split by Column
+
+```{r, eval = FALSE}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r}
+set.seed(1)
+codesymnmf_fits_by_col <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  S <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
+  codesymnmf_fits_by_col[[i]] <- codesymnmf::codesymnmf(S, 8)$H
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[1]])), max(abs(codesymnmf_fits_by_col[[1]])), length.out = 50))
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[2]])), max(abs(codesymnmf_fits_by_col[[2]])), length.out = 50))
+```
+
+These are histograms of the similarities:
+```{r}
+L1_L2_cosine_sim_mat <- compute_cosine_sim_matrix(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]])
+```
+
+```{r}
+par(mfrow = c(2,4))
+for(i in 1:nrow(L1_L2_cosine_sim_mat)){
+  hist(L1_L2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+The gap between similar and dissimilar pairs in these histograms is not as large as that of the EBCD histograms.
+
+Now, let's apply stability selection. Based off the histograms above, I chose a similarity threshold of 0.8. I tested a few other threshold options and I found that 0.7 was the smallest I could go without returning extra factors.
+```{r}
+set.seed(1)
+L_est_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.8)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+This is the correlation between the estimate and the true loadings:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, max)
+```
+
+Stability selection with CoDesymNMF is also able to recover all four components. However, the extra factors looked more similar to true signal than the extra factors seen in the previous methods. Therefore a more stringent threshold was needed to not return any extra factors. 
+
 # Balanced Nonoverlap
 
 In this section, I test out the method in the balanced non-overlapping setting.
@@ -708,9 +752,7 @@ This is heatmap of the factor estimate from the second subset:
 plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))
 ```
 
-For both estimates, the last two factors appear to be close to the zero vector. Let's take a closer look.
-
-This is a plot of the last two factor estimates from the first subset:
+This is a plot of the last factor estimate from the first subset:
 ```{r}
 par(mfrow = c(1,2))
 for (i in 5){
@@ -751,6 +793,8 @@ This is heatmap of the new factor estimate from the second subset:
 ```{r}
 plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))
 ```
+
+This is another instance of the method picking out the correct number of factors (after removing the factors which were zeroed out).
 
 These are histograms of the similarities:
 ```{r}
@@ -817,7 +861,7 @@ flash_estimate_L <- flash_init(sim_data$Y) %>%
 plot_heatmap(flash_estimate_L$L_pm)
 ```
 
-The one backfit iteration helps make the estimate more sparse, shrinking the small values to zero.
+The one backfit iteration helps make the estimate more sparse.
 
 ## EBCD
 
@@ -861,7 +905,7 @@ for(i in 1:nrow(L1_L2_cosine_sim_mat)){
 par(mfrow = c(1,1))
 ```
 
-Now, let's apply stability selection. I again use a similarity threshold of 0.8.
+Now, let's apply stability selection. I again use a similarity threshold of 0.8. (I tested out other threshold options and 0.3 was the smallest threshold which did not return any extra factors).
 ```{r}
 set.seed(1)
 L_est_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.8)
@@ -931,7 +975,7 @@ for(i in 1:nrow(F1_F2_cosine_sim_mat)){
 par(mfrow = c(1,1))
 ```
 
-Let's apply stability selection
+Let's apply stability selection.
 ```{r}
 set.seed(1)
 F_est <- stability_selection_post_processing(ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]], threshold = 0.8)
@@ -1033,3 +1077,62 @@ This is the final loadings estimate:
 ```{r}
 plot_heatmap(ebcd_estimate_L_orthog, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_estimate_L_orthog)), max(abs(ebcd_estimate_L_orthog)), length.out = 50))
 ```
+
+## CoDesymNMF
+
+### Split by Column
+
+```{r, eval = FALSE}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r}
+set.seed(1)
+codesymnmf_fits_by_col <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  S <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
+  codesymnmf_fits_by_col[[i]] <- codesymnmf::codesymnmf(S, 8)$H
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[1]])), max(abs(codesymnmf_fits_by_col[[1]])), length.out = 50))
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[2]])), max(abs(codesymnmf_fits_by_col[[2]])), length.out = 50))
+```
+
+These are histograms of the similarities:
+```{r}
+L1_L2_cosine_sim_mat <- compute_cosine_sim_matrix(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]])
+```
+
+```{r}
+par(mfrow = c(2,4))
+for(i in 1:nrow(L1_L2_cosine_sim_mat)){
+  hist(L1_L2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+Now, let's apply stability selection. Based off the histograms above, I chose a similarity threshold of 0.8. I tested a few other threshold options and I found that 0.7 was the smallest I could go without returning extra factors.
+```{r}
+set.seed(1)
+L_est_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.8)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+This is the correlation between the estimate and the true loadings:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, max)
+```
+
+We are able to recover all four components.
