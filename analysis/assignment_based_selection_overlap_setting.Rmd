@@ -23,22 +23,8 @@ library(flashier)
 source('code/visualization_functions.R')
 ```
 
-```{r}
-compute_cosine_sim_matrix <- function(L1, L2){
-  norms1 <- apply(L1, 2, function(x){sqrt(sum(x^2))})
-  norms1[norms1 == 0] <- Inf
-
-  norms2 <- apply(L2, 2, function(x){sqrt(sum(x^2))})
-  norms2[norms2 == 0] <- Inf
-
-  L1_normalized <- t(t(L1)/norms1)
-  L2_normalized <- t(t(L2)/norms2)
-
-  #compute matrix of cosine similarities
-  cosine_sim_matrix <- crossprod(L1_normalized, L2_normalized)
-
-  return(cosine_sim_matrix)
-}
+```{r cosine_sim_code}
+source('code/compute_cosine_sim_matrix.R')
 ```
 
 # Stability Selection Code
@@ -191,7 +177,7 @@ This is the max correlation for each true factor:
 apply(cor(ebcd_fits_by_col[[1]], sim_data$LL), 2, max)
 ```
 
-All of the factors are accurately recovered.
+All of the factors are accurately recovered. The first 10 factors correspond to the true factors and the other ten factors are spurious.
 
 This is a heatmap of the loadings estimate from the second subset:
 ```{r}
@@ -203,7 +189,7 @@ This is the max correlation for each true factor:
 apply(cor(ebcd_fits_by_col[[2]], sim_data$LL), 2, max)
 ```
 
-This estimate also accurately recovers all of the factors.
+This estimate also accurately recovers all of the factors. Again, the first 10 factors correspond to the true factors and the other ten factors are spurious.
 
 Both loadings estimates have ten extra factors. Visually, these extra factors don't seem to be highly correlated across the two estimates.
 
@@ -220,7 +206,7 @@ for (i in 1:ncol(ebcd_fits_by_col[[1]])){
 par(mfrow = c(1,1))
 ```
 
-Now, let's apply stability selection. Based off of the histograms of the cosine similarity, I chose a threshold of 0.8.
+Now, let's apply stability selection. Based off of the histograms of the cosine similarity, I chose a threshold of 0.8. Note that the gap between similar and dissimilar pairs is quite large, so I could have used a lower threshold, e.g. 0.5, and gotten the same results.
 ```{r}
 set.seed(1)
 L_est_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.8)
@@ -456,7 +442,7 @@ These are the true factors which are most correlated with each estimated factor:
 apply(cor(F_est, sim_data$FF), 1, which.max)
 ```
 
-We are able to recover five components. The method does not return any extra factors.
+We are able to recover seven components. The method does not return any extra factors.
 
 I obtain an initial estimate for $L$ by using non-negative least squares.
 ```{r}
@@ -543,7 +529,7 @@ L1_L2_cosine_sim_mat <- compute_cosine_sim_matrix(gbcd_fits_by_col[[1]], gbcd_fi
 ```
 
 ```{r}
-par(mfrow = c(4,4))
+par(mfrow = c(4,4), mar = c(2,2,1,1))
 for(i in 1:nrow(L1_L2_cosine_sim_mat)){
   hist(L1_L2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
 }
@@ -569,11 +555,6 @@ apply(cor(L_est_by_col, sim_data$LL), 1, max)
 These are the true loadings factors which are most correlated with each estimated loadings factor:
 ```{r}
 apply(cor(L_est_by_col, sim_data$LL), 1, which.max)
-```
-
-These are the true factors that we were able to recover (the correlation was larger than 0.9):
-```{r}
-apply(cor(L_est_by_col, sim_data$LL), 1, which.max)[apply(cor(L_est_by_col, sim_data$LL), 1, max) > 0.9]
 ```
 
 We are able to recover nine of the ten components. Component 10 was well recovered in the first subset, but not in the second subset. So perhaps the factors that corresponded most with true factor 10 were not paired together, or if they were paired together, their similarity was not high enough. (After further investigation, it seems to be the former.)
@@ -603,19 +584,9 @@ This is heatmap of the factor estimate from the first subset:
 plot_heatmap(gbcd_fits_by_row_F[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[1]])), max(abs(gbcd_fits_by_row_F[[1]])), length.out = 50))
 ```
 
-This is the correlation between the true factors and the estimated factors:
-```{r}
-apply(cor(gbcd_fits_by_row_F[[1]], sim_data$FF), 2, max)
-```
-
 This is heatmap of the factor estimate from the second subset:
 ```{r}
 plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))
-```
-
-This is the correlation between the true factors and the estimated factors:
-```{r}
-apply(cor(gbcd_fits_by_row_F[[2]], sim_data$FF), 2, max)
 ```
 
 To process the factor estimates, I first remove factors which are essentially zero vectors.
@@ -647,7 +618,7 @@ F1_F2_cosine_sim_mat <- compute_cosine_sim_matrix(gbcd_fits_by_row_F[[1]], gbcd_
 ```
 
 ```{r}
-par(mfrow = c(4,4))
+par(mfrow = c(4,4), mar = c(2,2,1,1))
 for(i in 1:nrow(F1_F2_cosine_sim_mat)){
   hist(F1_F2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
 }
@@ -690,8 +661,7 @@ L_est <- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)
 plot_heatmap(L_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))
 ```
 
-The $L$ estimate has the main components. Now, I run backfitting with flash on the data matrix with $F$ fixed to the consensus estimate to get an estimate for $L$. I use the generalized binary prior for $L$. Note I run the backfit for only one iteration.
-
+Now, we run one iteration of backfit with flash. I use a generalized binary prior on the loadings.
 ```{r}
 flash_estimate_L <- flash_init(sim_data$Y) %>%
   flash_factors_init(list(L_est, F_est), ebnm_fn = c(ebnm::ebnm_generalized_binary, ebnm::ebnm_point_laplace)) %>%
@@ -705,7 +675,7 @@ This is a heatmap of the final loadings estimate:
 plot_heatmap(flash_estimate_L$L_pm)
 ```
 
-The one backfit iteration helps make the estimate more sparse, shrinking the small values to zero.
+The one backfit iteration helps make the estimate more sparse.
 
 This is the correlation between the estimated loadings and the true loadings:
 ```{r}
@@ -714,7 +684,7 @@ apply(cor(flash_estimate_L$L_pm, sim_data$LL), 1, max)
 
 These are the true loadings which are most correlated with each estimated loadings factor:
 ```{r}
-apply(cor(flash_estimate_L$L_pm, sim_data$LL), 1, max)
+apply(cor(flash_estimate_L$L_pm, sim_data$LL), 1, which.max)
 ```
 
 ### Threshold = 0.1
@@ -751,8 +721,7 @@ L_est <- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)
 plot_heatmap(L_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))
 ```
 
-The $L$ estimate has the main components. Now, I run backfitting with flash on the data matrix with $F$ fixed to the consensus estimate to get an estimate for $L$. I use the generalized binary prior for $L$. Note I run the backfit for only one iteration.
-
+Now, we run one iteration of backfit with flash.
 ```{r}
 flash_estimate_L <- flash_init(sim_data$Y) %>%
   flash_factors_init(list(L_est, F_est), ebnm_fn = c(ebnm::ebnm_generalized_binary, ebnm::ebnm_point_laplace)) %>%
@@ -766,7 +735,7 @@ This is a heatmap of the final loadings estimate:
 plot_heatmap(flash_estimate_L$L_pm)
 ```
 
-The one backfit iteration helps make the estimate more sparse, shrinking the small values to zero.
+Again, the one backfit iteration helps make the estimate more sparse, shrinking the small values to zero.
 
 This is the correlation between the estimated loadings and the true loadings:
 ```{r}
@@ -777,3 +746,111 @@ These are the true loadings which are most correlated with each estimated loadin
 ```{r}
 apply(cor(flash_estimate_L$L_pm, sim_data$LL), 1, which.max)
 ```
+
+# CoDesymNMF
+
+## Split by Columns
+
+```{r, eval = FALSE}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r}
+set.seed(1)
+codesymnmf_fits_by_col <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  S <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
+  codesymnmf_fits_by_col[[i]] <- codesymnmf::codesymnmf(S, 20)$H
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[1]])), max(abs(codesymnmf_fits_by_col[[1]])), length.out = 50))
+```
+
+This is the correlation of the true factors and estimated factors:
+```{r}
+apply(cor(codesymnmf_fits_by_col[[1]], sim_data$LL), 2, max)
+```
+
+All the true factors are recovered well in this subset.
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[2]])), max(abs(codesymnmf_fits_by_col[[2]])), length.out = 50))
+```
+
+This is the correlation of the true factors and estimated factors:
+```{r}
+apply(cor(codesymnmf_fits_by_col[[2]], sim_data$LL), 2, max)
+```
+
+All the true factors are recovered well in this subset.
+
+These are histograms of the similarities:
+```{r}
+L1_L2_cosine_sim_mat <- compute_cosine_sim_matrix(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]])
+```
+
+```{r}
+par(mfrow = c(5,4), mar = c(2,2,1,1))
+for(i in 1:nrow(L1_L2_cosine_sim_mat)){
+  hist(L1_L2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+Now, let's apply stability selection. 
+
+### Threshold = 0.8
+
+Based off the histograms, I picked a threshold of 0.8
+```{r}
+set.seed(1)
+L_est_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.8)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+This is the correlation between the estimate and the true loadings:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, max)
+```
+
+This is the true factor which is most correlated with each estimated factor:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, which.max)
+```
+
+We are able to recover all ten components. However, we also return two extra components -- there are two estimated components which are most correlated with true component 10 and two estimated components which are most correlated with true component 6.
+
+### Threshold = 0.88
+
+I tested other threshold options and found that 0.88 was the smallest value which did not return more than 10 factors. However, not all of the true signals are recovered. In addition, if we increase the threshold to 0.9, then the method returns 8 factors.
+
+```{r}
+set.seed(1)
+L_est_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.88)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+This is the correlation between the estimate and the true loadings:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, max)
+```
+
+This is the true factor which is most correlated with each estimated factor:
+```{r}
+apply(cor(L_est_by_col, sim_data$LL), 1, which.max)
+```
+
+We see that there are two components which are most correlated with true component 6. Looking at the correlation matrix, we see that true component 4 is not well recovered, with a maximum correlation of 0.31. This is surprising since both of the subset estimates seemed to recover component 4 well. Looking into this further, it seems like the components that had the highest correlation with true component 4 were not matched. As a result, a lower threshold is needed to recover this component.
