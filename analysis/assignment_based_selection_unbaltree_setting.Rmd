@@ -1,0 +1,790 @@
+---
+title: "assignment_based_selection_unbaltree_setting"
+author: "Annie Xie"
+date: "2025-10-08"
+output: 
+  workflowr::wflow_html:
+    code_folding: hide
+editor_options:
+  chunk_output_type: console
+---
+
+# Introduction
+In this analysis, I test an assignment-based stability selection method in the balanced tree setting.
+
+```{r load_packages, message = FALSE, warning = FALSE}
+library(dplyr)
+library(ggplot2)
+library(pheatmap)
+library(flashier)
+```
+
+```{r load_viz_code}
+source('code/visualization_functions.R')
+```
+
+```{r cosine_sim_code}
+source('code/compute_cosine_sim_matrix.R')
+```
+
+# Stability Selection Code
+```{r split_data_code}
+stability_selection_split_data <- function(X, dim = c('rows', 'columns')){
+
+  if (dim == 'rows'){
+    n <- nrow(X)
+    n1 <- ceiling(n/2)
+    # n2 <- floor(nrow(X)/2)
+  } else if (dim == 'columns'){
+    n <- ncol(X)
+    n1 <- ceiling(n/2)
+    # n2 <- floor(ncol(X)/2)
+  } else {
+    stop('Wrong input for dim')
+  }
+
+  subset1 <- sample(n, size = n1, replace = FALSE)
+  if (dim == 'columns'){
+    X1 <- X[,subset1]
+    X2 <- X[,-(subset1)]
+  } else { # dim = 'rows'
+    X1 <- X[subset1,]
+    X2 <- X[-(subset1),]
+  }
+  return(list(X1, X2, subset1, setdiff(c(1:n), subset1)))
+}
+```
+
+```{r}
+filter_out_duplicates <- function(L){
+  cosine_sim_mat <- compute_cosine_sim_matrix(L,L)
+  cosine_sim_mat[lower.tri(cosine_sim_mat, diag = TRUE)] <- 0
+  duplicates <- which(cosine_sim_mat > 0.99 ,arr.ind = TRUE)
+  
+  removed.idx <- c()
+  for (i in 1:nrow(duplicates)){
+    idx.to_remove <- duplicates[i,2]
+    if (!(idx.to_remove %in% removed.idx)){
+      L <- L[,-idx.to_remove, drop = FALSE]
+      removed.idx <- c(removed.idx, idx.to_remove)
+    }
+  }
+}
+```
+
+```{r}
+stability_selection_post_processing <- function(L1, L2, threshold=0.99){
+  
+  # compute similarity
+  cosine_sim_matrix <- compute_cosine_sim_matrix(L1, L2)
+  
+  # find pairings
+  # assignment_problem <- lpSolve::lp.assign(cosine_sim_matrix, direction = "max")
+  # pairings <- which(assignment_problem$solution == 1, arr.ind = TRUE)
+  
+  assignment_problem <- RcppHungarian::HungarianSolver(-1*cosine_sim_matrix)
+  pairings <- assignment_problem$pairs
+  
+  # remove things that were not paired
+  no_pair <- pairings[,2] == 0
+  pairings <- pairings[!(no_pair), , drop = FALSE]
+  
+  # filter pairings
+  pairing_similarities <- cosine_sim_matrix[pairings]
+  pairings.keep <- pairing_similarities > threshold
+  pairings <- pairings[pairings.keep, , drop = FALSE]
+  K <- nrow(pairings)
+  
+  # compute final estimate
+  if (K > 0){
+    L_final <- matrix(0, nrow = nrow(L1), ncol = K)
+    for(i in 1:K){
+      L_final[,i] <- rowMeans(cbind(L1[, pairings[i,1]], L2[, pairings[i,2]]))
+    }
+  } else {
+    L_final <- matrix(0, nrow = nrow(L1), ncol = 1)
+  }
+  
+  return(L_final)
+}
+```
+
+# Unbalanced Tree Data Generation
+
+```{r}
+sim_4pops_unbal_tree <- function(args) {
+  set.seed(args$seed)
+  
+  n <- sum(args$pop_sizes)
+  p <- args$n_genes
+  
+  FF <- matrix(rnorm(7 * p, sd = rep(args$branch_sds, each = p)), ncol = 7)
+  # if (args$constrain_F) {
+  #   FF_svd <- svd(FF)
+  #   FF <- FF_svd$u
+  #   FF <- t(t(FF) * branch_sds * sqrt(p))
+  # }
+  
+  # check if this is right!
+  LL <- matrix(0, nrow = n, ncol = 7)
+  LL[, 1] <- 1
+  LL[, 2] <- rep(c(1, 0, 0, 0), times = args$pop_sizes)
+  LL[, 3] <- rep(c(0, 1, 1, 1), times = args$pop_sizes)
+  LL[, 4] <- rep(c(0, 1, 0, 0), times = args$pop_sizes)
+  LL[, 5] <- rep(c(0, 0, 1, 1), times = args$pop_sizes)
+  LL[, 6] <- rep(c(0, 0, 1, 0), times = args$pop_sizes)
+  LL[, 7] <- rep(c(0, 0, 0, 1), times = args$pop_sizes)
+  
+  E <- matrix(rnorm(n * p, sd = args$indiv_sd), nrow = n)
+  Y <- LL %*% t(FF) + E
+  YYt <- (1/p)*tcrossprod(Y)
+  return(list(Y = Y, YYt = YYt, LL = LL, FF = FF, K = ncol(LL)))
+}
+```
+
+```{r}
+sim_args = list(pop_sizes = rep(40, 4), n_genes = 1000, branch_sds = rep(2,7), indiv_sd = 1, seed = 1)
+sim_data <- sim_4pops_unbal_tree(sim_args)
+```
+
+```{r}
+plot_heatmap(sim_data$LL)
+```
+
+# GBCD
+
+In this section, I test the method with GBCD.
+
+## Split by Column
+
+```{r split_by_col}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r gbcd_col_split_fits}
+gbcd_fits_by_col <- list()
+gbcd_fits_by_col_F <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  gb_fit <- gbcd::fit_gbcd(X_split_by_col[[i]], 
+                                   Kmax = 7, 
+                                   prior = ebnm::ebnm_generalized_binary,
+                                   verbose = 0)
+  gbcd_fits_by_col[[i]] <- gb_fit$L
+  gbcd_fits_by_col_F[[i]] <- gb_fit$F$lfc
+}
+```
+
+This is heatmap of the new factor estimate from the first subset:
+```{r}
+plot_heatmap(gbcd_fits_by_col_F[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_col_F[[1]])), max(abs(gbcd_fits_by_col_F[[1]])), length.out = 50))
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(gbcd_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_col[[1]])), max(abs(gbcd_fits_by_col[[1]])), length.out = 50))
+```
+
+These are plots of the last two factor estimates:
+```{r}
+par(mfrow = c(1,2))
+for(i in 6:7){
+  plot(gbcd_fits_by_col_F[[1]][,i], main = paste('factor', i))
+}
+par(mfrow = c(1,1))
+```
+
+The last two factors appear to be essentially zero. Taking this into account, this would get rid of the duplicates in the GBCD loadings estimate.
+
+This is heatmap of the new factor estimate from the second subset:
+```{r}
+plot_heatmap(gbcd_fits_by_col_F[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_col_F[[2]])), max(abs(gbcd_fits_by_col_F[[2]])), length.out = 50))
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(gbcd_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_col[[2]])), max(abs(gbcd_fits_by_col[[2]])), length.out = 50))
+```
+
+This is a plot of the last factor estimate:
+```{r}
+for(i in 7){
+  plot(gbcd_fits_by_col_F[[2]][,i], main = paste('factor', i))
+}
+```
+
+The last factor estimate seems to be zero. The last loadings estimate essentially captures the first and fourth populations, which are already captured in two other components. Perhaps the semi-nonnegative matrix factorization viewed the last factor as redundant. 
+
+I will keep the loadings corresponding to zero factors for now. But perhaps this is a post-processing step that should be added to the GBCD output.
+
+These are histograms of the similarities:
+```{r}
+L1_L2_cosine_sim_mat <- compute_cosine_sim_matrix(gbcd_fits_by_col[[1]], gbcd_fits_by_col[[2]])
+```
+
+```{r}
+par(mfrow = c(3,3))
+for(i in 1:nrow(L1_L2_cosine_sim_mat)){
+  hist(L1_L2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+Now we apply stability selection. From the histograms above, I decided to apply stability selection with a threshold of 0.8.
+```{r}
+set.seed(1)
+L_est_by_col <- stability_selection_post_processing(gbcd_fits_by_col[[1]], gbcd_fits_by_col[[2]], threshold = 0.8)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+This is the similarity between the estimate and the true loadings:
+```{r}
+apply(compute_cosine_sim_matrix(L_est_by_col, sim_data$LL), 1, max)
+```
+
+These are the true loadings factors which are most similar with each estimated loadings factor:
+```{r}
+apply(compute_cosine_sim_matrix(L_est_by_col, sim_data$LL), 1, which.max)
+```
+
+This estimate doesn't look exactly like the unbalanced tree decomposition I was going for. I think the method prefers a more balanced representation, so it favors a "baseline" which incorporates both the baseline factor and the 3 vs 1 split.
+
+## Split by Row
+Now, we try splitting the rows:
+```{r}
+set.seed(1)
+X_split_by_row <- stability_selection_split_data(sim_data$Y, dim = 'rows')
+```
+
+This is the true loadings matrix for the first subset:
+```{r}
+plot_heatmap(sim_data$LL[sort(X_split_by_row[[3]]),])
+```
+
+These are the number of samples per factor in the first subset:
+```{r}
+colSums(sim_data$LL[X_split_by_row[[3]],])
+```
+
+This is the true loadings matrix for the second subset:
+```{r}
+plot_heatmap(sim_data$LL[X_split_by_row[[4]],])
+```
+
+These are the number of samples per factor in the second subset:
+```{r}
+colSums(sim_data$LL[X_split_by_row[[4]],])
+```
+
+```{r}
+gbcd_fits_by_row_F <- list()
+gbcd_fits_by_row_L <- list()
+for (i in 1:(length(X_split_by_row)/2)){
+  gbcd_fit <- gbcd::fit_gbcd(X_split_by_row[[i]], 
+                                   Kmax = 7, 
+                                   prior = ebnm::ebnm_generalized_binary,
+                                   verbose = 0)
+  gbcd_fits_by_row_F[[i]] <- gbcd_fit$F$lfc
+  gbcd_fits_by_row_L[[i]] <- gbcd_fit$L
+}
+```
+
+This is heatmap of the factor estimate from the first subset:
+```{r}
+plot_heatmap(gbcd_fits_by_row_F[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[1]])), max(abs(gbcd_fits_by_row_F[[1]])), length.out = 50))
+```
+
+This is heatmap of the factor estimate from the second subset:
+```{r}
+plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))
+```
+
+To process the factor estimates, I remove factors which are essentially zero vectors.
+```{r}
+for (j in 1:2){
+  idx.keep <- apply(gbcd_fits_by_row_F[[j]], 2, function(x){sqrt(sum(x^2))}) > 10^(-10)
+  gbcd_fits_by_row_F[[j]] <- gbcd_fits_by_row_F[[j]][,idx.keep]
+}
+```
+
+This is heatmap of the new factor estimate from the first subset:
+```{r}
+plot_heatmap(gbcd_fits_by_row_F[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[1]])), max(abs(gbcd_fits_by_row_F[[1]])), length.out = 50))
+```
+
+This is the max correlation for each true factor:
+```{r}
+apply(cor(gbcd_fits_by_row_F[[1]], sim_data$FF), 2, max)
+```
+
+This is heatmap of the new factor estimate from the second subset:
+```{r}
+plot_heatmap(gbcd_fits_by_row_F[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(gbcd_fits_by_row_F[[2]])), max(abs(gbcd_fits_by_row_F[[2]])), length.out = 50))
+```
+
+This is the max correlation for each true factor:
+```{r}
+apply(cor(gbcd_fits_by_row_F[[2]], sim_data$FF), 2, max)
+```
+
+These are histograms of the similarities:
+```{r}
+F1_F2_cosine_sim_mat <- compute_cosine_sim_matrix(gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]])
+```
+
+```{r}
+par(mfrow = c(2,3))
+for(i in 1:nrow(F1_F2_cosine_sim_mat)){
+  hist(F1_F2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+Now, we apply stability selection. 
+
+### Threshold = 0.6
+After analyzing the cosine similarity matrix and histograms, I chose a similarity threshold of 0.6.
+```{r}
+set.seed(1)
+F_est <- stability_selection_post_processing(gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]], threshold = 0.6)
+```
+
+This is a heatmap of the final factor estimate:
+```{r}
+plot_heatmap(F_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(F_est)), max(abs(F_est)), length.out = 50))
+```
+
+This is the correlation between the estimated factors and true factors:
+```{r}
+apply(cor(F_est, sim_data$FF), 1, max)
+```
+
+These are the true factors that are most correlated with each estimated factor:
+```{r}
+apply(cor(F_est, sim_data$FF), 1, which.max)
+```
+
+I obtain an initial estimate for $L$ using non-negative least squares.
+```{r}
+# use nonnegative least squares estimate here
+L_est <- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)
+```
+
+```{r}
+plot_heatmap(L_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))
+```
+
+```{r}
+flash_estimate_L <- flash_init(sim_data$Y) %>%
+  flash_factors_init(list(L_est, F_est), ebnm_fn = c(ebnm::ebnm_generalized_binary, ebnm::ebnm_point_laplace)) %>%
+  flash_factors_fix(kset = 1:ncol(F_est), which_dim = 'factors') %>%
+  flash_backfit(maxiter = 1) %>%
+  flash_nullcheck()
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(flash_estimate_L$L_pm)
+```
+
+The one backfit iteration helps make the estimate more sparse, shrinking the small values to zero.
+
+This is the similarity between the estimated loadings and the true loadings:
+```{r}
+apply(compute_cosine_sim_matrix(flash_estimate_L$L_pm, sim_data$LL), 1, max)
+```
+
+These are the true loadings which are most correlated with each estimated loadings factor:
+```{r}
+apply(compute_cosine_sim_matrix(flash_estimate_L$L_pm, sim_data$LL), 1, which.max)
+```
+
+For a threshold of 0.6, the method only returns three factors. Two of the loadings correspond to population-specific effects. The third loadings factor captures a combination of the baseline factor and the 3 vs 1 factor -- this is something I've commonly seen in other decompositions.
+
+### Threshold = 0.2
+
+For comparison, I try a lower similarity threshold of 0.2.
+```{r}
+set.seed(1)
+F_est <- stability_selection_post_processing(gbcd_fits_by_row_F[[1]], gbcd_fits_by_row_F[[2]], threshold = 0.2)
+```
+
+This is a heatmap of the final factor estimate:
+```{r}
+plot_heatmap(F_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(F_est)), max(abs(F_est)), length.out = 50))
+```
+
+This is the correlation between the estimated factors and true factors:
+```{r}
+apply(cor(F_est, sim_data$FF), 1, max)
+```
+
+These are the true factors that are most correlated with each estimated factor:
+```{r}
+apply(cor(F_est, sim_data$FF), 1, which.max)
+```
+
+I obtain an initial estimate for $L$ using non-negative least squares.
+```{r}
+# use nonnegative least squares estimate here
+L_est <- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)
+```
+
+```{r}
+plot_heatmap(L_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))
+```
+
+```{r}
+flash_estimate_L <- flash_init(sim_data$Y) %>%
+  flash_factors_init(list(L_est, F_est), ebnm_fn = c(ebnm::ebnm_generalized_binary, ebnm::ebnm_point_laplace)) %>%
+  flash_factors_fix(kset = 1:ncol(F_est), which_dim = 'factors') %>%
+  flash_backfit(maxiter = 1) %>%
+  flash_nullcheck()
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(flash_estimate_L$L_pm)
+```
+
+The one backfit iteration helps make the estimate more sparse, shrinking the small values to zero.
+
+This is the similarity between the estimated loadings and the true loadings:
+```{r}
+apply(compute_cosine_sim_matrix(flash_estimate_L$L_pm, sim_data$LL), 1, max)
+```
+
+These are the true loadings which are most correlated with each estimated loadings factor:
+```{r}
+apply(compute_cosine_sim_matrix(flash_estimate_L$L_pm, sim_data$LL), 1, which.max)
+```
+
+With this threshold, the method returns four factors. The additional factor captures a combination of the 2 vs 2 split and the last population-specific effect.
+
+# EBCD
+
+## Split by Column
+
+```{r, eval = FALSE}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r}
+set.seed(1)
+ebcd_fits_by_col <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  ebcd_fits_by_col[[i]] <- ebcd::ebcd(t(X_split_by_col[[i]]), 
+                                   Kmax = 14, 
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)$EL
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(ebcd_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[1]])), max(abs(ebcd_fits_by_col[[1]])), length.out = 50))
+```
+
+This estimate effectively uses only four factors. Furthermore, the estimate doesn't look quite binary.
+
+This is the max similarity for each true factor:
+```{r}
+apply(compute_cosine_sim_matrix(ebcd_fits_by_col[[1]], sim_data$LL), 2, max)
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(ebcd_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_col[[2]])), max(abs(ebcd_fits_by_col[[2]])), length.out = 50))
+```
+
+Again, this estimate effectively uses only four factors. This decomposition looks a little different from the decomposition from the first subset. This is not so surprising since the tree setting has non-identifiability issues.
+
+This is the max similarity for each true factor:
+```{r}
+apply(compute_cosine_sim_matrix(ebcd_fits_by_col[[2]], sim_data$LL), 2, max)
+```
+
+```{r}
+cosine_sim_mat <- compute_cosine_sim_matrix(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]])
+```
+
+These are histograms of the cosine similarities for each factor of the first subset estimate:
+```{r}
+par(mfrow = c(4,4), mar = c(2,2,1,1))
+for (i in 1:ncol(ebcd_fits_by_col[[1]])){
+  hist(cosine_sim_mat[i,], main = "", xlab = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+Now, let's apply stability selection. Based off of the histograms of the cosine similarity, I chose a threshold of 0.6.
+```{r}
+set.seed(1)
+L_est_by_col <- stability_selection_post_processing(ebcd_fits_by_col[[1]], ebcd_fits_by_col[[2]], threshold = 0.6)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+This is the similarity between the estimate and the true loadings:
+```{r}
+apply(compute_cosine_sim_matrix(L_est_by_col, sim_data$LL), 1, max)
+```
+
+These are the true factors which are most highly correlated with each estimated factor:
+```{r}
+apply(compute_cosine_sim_matrix(L_est_by_col, sim_data$LL), 1, which.max)
+```
+
+Our loadings estimate does not really look like a tree. This speaks to EBCD's struggles in the tree setting.
+
+## Split by Row
+Now, we try splitting the rows:
+```{r, eval = FALSE}
+set.seed(1)
+X_split_by_row <- stability_selection_split_data(sim_data$Y, dim = 'rows')
+```
+
+```{r}
+transform_ebcd_Z <- function(Y, ebcd_obj){
+  Y.svd <- svd(Y)
+  Y.UV <- Y.svd$u %*% t(Y.svd$v)
+  Z_transformed <- Y.UV %*% ebcd_obj$Z
+  return(Z_transformed)
+}
+```
+
+```{r}
+set.seed(1)
+ebcd_fits_by_row_L <- list()
+ebcd_fits_by_row_F <- list()
+for (i in 1:(length(X_split_by_row)/2)){
+  ebcd_fit <- ebcd::ebcd(t(X_split_by_row[[i]]), 
+                                   Kmax = 14, 
+                                   ebnm_fn = ebnm::ebnm_generalized_binary)
+  ebcd_fits_by_row_L[[i]] <- ebcd_fit$EL
+  ebcd_fits_by_row_F[[i]] <- transform_ebcd_Z(t(X_split_by_row[[i]]), ebcd_fit)
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(ebcd_fits_by_row_L[[1]][order(X_split_by_row[[3]]),], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_L[[1]])), max(abs(ebcd_fits_by_row_L[[1]])), length.out = 50))
+```
+
+This is heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(ebcd_fits_by_row_L[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_L[[2]])), max(abs(ebcd_fits_by_row_L[[2]])), length.out = 50))
+```
+
+This is heatmap of the factor estimate from the first subset:
+```{r}
+plot_heatmap(ebcd_fits_by_row_F[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_F[[1]])), max(abs(ebcd_fits_by_row_F[[1]])), length.out = 50))
+```
+
+This is the max correlation of the true factors:
+```{r}
+apply(cor(ebcd_fits_by_row_F[[1]], sim_data$FF), 2, max)
+```
+
+This is heatmap of the factor estimate from the second subset:
+```{r}
+plot_heatmap(ebcd_fits_by_row_F[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(ebcd_fits_by_row_F[[2]])), max(abs(ebcd_fits_by_row_F[[2]])), length.out = 50))
+```
+
+This is the max correlation of the true factors:
+```{r}
+apply(cor(ebcd_fits_by_row_F[[2]], sim_data$FF), 2, max)
+```
+
+Overall, the estimates do an okay job at recovering the true factors. Visually speaking, the loadings estimates capture some of the tree structure. But the decomposition is not strictly binary; multiple effects seem to be combined into single factors.
+
+```{r}
+cosine_sim_mat <- compute_cosine_sim_matrix(ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]])
+```
+
+These are histograms of the cosine similarities for each factor of the first subset estimate:
+```{r}
+par(mfrow = c(4,4), mar = c(2,2,1,1))
+for (i in 1:ncol(ebcd_fits_by_row_F[[1]])){
+  hist(cosine_sim_mat[i,], main = "", xlab = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+Now we apply stability selection.
+
+### Threshold = 0.6
+
+Based off of the histograms, I chose a threshold = 0.6.
+```{r}
+set.seed(1)
+F_est <- stability_selection_post_processing(ebcd_fits_by_row_F[[1]], ebcd_fits_by_row_F[[2]], threshold = 0.6)
+```
+
+This is a heatmap of the final factor estimate:
+```{r}
+plot_heatmap(F_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(F_est)), max(abs(F_est)), length.out = 50))
+```
+
+This is the correlation between the estimated factors and the true factors:
+```{r}
+apply(cor(F_est, sim_data$FF), 1, max)
+```
+
+These are the true factors which are most correlated with each estimated factor:
+```{r}
+apply(cor(F_est, sim_data$FF), 1, which.max)
+```
+
+Our final factor estimate has four factors.
+
+I obtain an initial estimate for $L$ by using non-negative least squares.
+```{r}
+# use nonnegative least squares estimate here
+L_est <- t(NNLM::nnlm(x = F_est , y = t(sim_data$Y))$coefficients)
+```
+
+This is a heatmap of the initial $L$ estimate:
+```{r}
+plot_heatmap(L_est, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est)), max(abs(L_est)), length.out = 50))
+```
+
+Now, we run one iteration of backfit with EBCD.
+```{r}
+ebcd_fit_L_given_Z <- function(Y, Z, EL, ebnm_fn, maxiter = 1){
+  n <- nrow(Y)
+  p <- ncol(Y)
+  Kmax <- ncol(Z)
+  
+  # initial estimate for tau
+  tau <- prod(dim(Y)) / sum((Y - (Z%*%t(EL)))^2)
+  V <- matrix(0, nrow = nrow(EL), ncol = ncol(EL))
+  
+  for (i in 1:maxiter){
+    for (k in 1:Kmax) {
+      x <- c(crossprod(Y, Z[, k])) / n
+      s <- rep(sqrt(1 / (n * tau)), times=length(x))
+      e <- ebnm_fn(x = x, s = s)
+      
+      EL[, k] <- e$posterior$mean
+      V[, k] <- e$posterior$sd^2
+    }
+    # update tau
+    tau <- prod(dim(Y)) / (sum((Y - Z %*% t(EL))^2) + n * sum(V))
+  }
+  return(EL)
+}
+```
+
+```{r}
+# issue: F is not orthogonal here; is that okay?
+ebcd_estimate_L <- ebcd_fit_L_given_Z(t(sim_data$Y), F_est, L_est, ebnm::ebnm_generalized_binary, maxiter = 1)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(ebcd_estimate_L)
+```
+
+This is the similarity between the estimated loadings and the true loadings:
+```{r}
+apply(compute_cosine_sim_matrix(ebcd_estimate_L, sim_data$LL), 1, max)
+```
+
+These are the true loadings which are most similar with each estimated loadings factor:
+```{r}
+apply(compute_cosine_sim_matrix(ebcd_estimate_L, sim_data$LL), 1, which.max)
+```
+
+Two of the loadings capture population-specific effects. However, the other two factors seem to capture numerous effects. Overall, this is not the binary decomposition that we were aiming to find.
+
+For brevity, I do not include the version of backfitting which uses an orthogonal matrix for the $F$ estimate. But I suspect the results would be about the same.
+
+# CoDesymNMF
+
+## Split by Columns
+
+```{r, eval = FALSE}
+set.seed(1)
+X_split_by_col <- stability_selection_split_data(sim_data$Y, dim = 'columns')
+```
+
+```{r}
+set.seed(1)
+codesymnmf_fits_by_col <- list()
+for (i in 1:(length(X_split_by_col)/2)){
+  S <- tcrossprod(X_split_by_col[[i]])/ncol(X_split_by_col[[i]])
+  codesymnmf_fits_by_col[[i]] <- codesymnmf::codesymnmf(S, 14)$H
+}
+```
+
+This is heatmap of the loadings estimate from the first subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[1]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[1]])), max(abs(codesymnmf_fits_by_col[[1]])), length.out = 50))
+```
+
+This estimate effectively uses four factors.
+
+This is the similarity of the true factors and estimated factors:
+```{r}
+apply(compute_cosine_sim_matrix(codesymnmf_fits_by_col[[1]], sim_data$LL), 2, max)
+```
+
+This is a heatmap of the loadings estimate from the second subset:
+```{r}
+plot_heatmap(codesymnmf_fits_by_col[[2]], colors_range = c('blue','gray96','red'), brks = seq(-max(abs(codesymnmf_fits_by_col[[2]])), max(abs(codesymnmf_fits_by_col[[2]])), length.out = 50))
+```
+
+This estimate also effectively uses four-five factors.
+
+This is the similarity of the true factors and estimated factors:
+```{r}
+apply(compute_cosine_sim_matrix(codesymnmf_fits_by_col[[2]], sim_data$LL), 2, max)
+```
+
+These are histograms of the similarities:
+```{r}
+L1_L2_cosine_sim_mat <- compute_cosine_sim_matrix(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]])
+```
+
+```{r}
+par(mfrow = c(4,4), mar = c(2,2,1,1))
+for(i in 1:nrow(L1_L2_cosine_sim_mat)){
+  hist(L1_L2_cosine_sim_mat[i,], xlab = "", ylab = "", main = paste('factor',i))
+}
+par(mfrow = c(1,1))
+```
+
+Now, let's apply stability selection. 
+
+### Threshold = 0.8
+
+Based off the histograms, I picked a threshold of 0.8
+```{r}
+set.seed(1)
+L_est_by_col <- stability_selection_post_processing(codesymnmf_fits_by_col[[1]], codesymnmf_fits_by_col[[2]], threshold = 0.8)
+```
+
+This is a heatmap of the final loadings estimate:
+```{r}
+plot_heatmap(L_est_by_col, colors_range = c('blue','gray96','red'), brks = seq(-max(abs(L_est_by_col)), max(abs(L_est_by_col)), length.out = 50))
+```
+
+This is the similarity between the estimate and the true loadings:
+```{r}
+apply(compute_cosine_sim_matrix(L_est_by_col, sim_data$LL), 1, max)
+```
+
+This is the true factor which is most similar with each estimated factor:
+```{r}
+apply(compute_cosine_sim_matrix(L_est_by_col, sim_data$LL), 1, which.max)
+```
+
+The final estimate contains four factors. Some of the factors contain binary-like components. But overall, this is not the binary decomposition we were hoping to find. This speaks to the struggles CoDesymNMF has in the unbalanced tree setting.
