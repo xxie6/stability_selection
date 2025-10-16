@@ -14,7 +14,14 @@ Main takeaways thus far:
   
 * Overall, splitting the data via the columns seems to have better performance than splitting via the rows. 
 
-All analyses:  
+Analyses with Hungarian Algorithm-based selection:  
+
+* Exploration of [Hungarian algo-based selection in nonoverlapping settings](assignment_based_stability_selection.html)   
+* Exploration of [Hungarian algo-based selection in overlapping setting](assignment_based_selection_overlap_setting.html) 
+* Exploration of [Hungarian algo-based selection in balanced tree setting](assignment_based_selection_baltree_setting.html)  
+* Exploration of the [Hungarian algo-based selection in unbalanced tree setting](assignment_based_selection_unbaltree_setting.html)   
+
+Initial analyses:  
    
 * Exploration of [stability selection in the unbalanced nonoverlapping setting](unbal_nonoverlap_setting.html) 
 * Exploration of [stability selection in the balanced nonoverlapping setting](bal_nonoverlap_setting.html) 
